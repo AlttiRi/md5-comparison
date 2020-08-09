@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>MD5 Comparison</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css"/>
+
+    <script src="vendor/js-md5.rolluped.js"></script>
+    <script src="vendor/spark-md5.rolluped.js"></script>
+    <script src="vendor/cb-md5.browserified.js"></script>
+    <script src="vendor/node-md5.browserified.js"></script>
+    <script src="vendor/blueimp-md5.rolluped.js"></script>
+    <script src="vendor/cryptojs-md5.rolluped.js"></script>
+    <script src="js/md5-container.js"></script>
+
+    <!--    <script src="js/console_log-to-html.js"></script>-->
+
+</head>
+<body>
+
+<div id="app">
+    <main-container-component></main-container-component>
+</div>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script type="module">
+    import * as Util from "./js/util.js";
+
+    const bus = new Vue();
+
+    const FormattedNumber = {
+        template: `
+          <span class="formatted-number">
+                <span
+                    v-for="(integerPart, index) of integerParts"
+                    :style="{
+                      paddingLeft: index !== 0 ? '2px' : ''
+                    }"
+                >{{ integerPart }}</span><span v-if="decimalTrimmed">.{{ decimalTrimmed }}</span>
+            </span>
+        `,
+        props: ["number"],
+        computed: {
+            integerParts() {
+                const array = [];
+                const [integer, decimal] = this.number.toString().split(".");
+
+                const offset = ((integer.length % 3) - 3) % 3;
+                for (let i = offset; i < integer.length; i += 3) {
+                    const part = integer.substring(i, i + 3);
+                    array.push(part);
+                }
+
+                return array;
+            },
+            decimalTrimmed() {
+                const [integer, decimal] = this.number.toString().split(".");
+                if (!decimal || integer.length > 2) {
+                    return null;
+                }
+                if (integer.length === 2) {
+                    return decimal.substring(0, 1);
+                }
+                return decimal.substring(0, 2);
+            }
+        }
+    }
+
+
+    const FileInputDragNDropComponent = {
+        template: `
+          <div class="file-input-drag-n-drop-component"
+               v-bind:class="{'drop-hover': dropHover}"
+               @drop="onFileDrop"
+               @dragenter="onFileDragEnter"
+               @dragleave="onFileDragLeave"
+               @dragover="onFileDragOver"
+          >
+          <label for="file-input" style="width: 100%; height: 100%;">
+            <div id="add-files-button" v-if="!file">
+              <slot>Select file</slot>
+            </div>
+            <input
+                id="file-input" type="file" accept="*/*" style="display: none"
+                @change="onFileInputChange"
+            >
+            <div class="file-info">
+              <div class="file-name" v-if="file" :title="file.name">{{ file.name }}</div>
+              <div class="file-size" v-if="file">{{ bytesToSize(file.size) }}</div>
+              <div class="file-mtime" v-if="file">{{ secondsToFormattedString(file.lastModified / 1000) }}</div>
+            </div>
+
+          </label>
+          </div>
+        `,
+        props: ["file"],
+        data() {
+            return {
+                dropHover: false
+            }
+        },
+        methods: {
+            secondsToFormattedString: Util.secondsToFormattedString,
+            bytesToSize: Util.bytesToSize,
+
+            async handleFileData(file) {
+                this.$emit("file-input-change", file);
+            },
+
+            async onFileInputChange(event) {
+                const fileElem = event.target;
+                const file = fileElem.files[0];
+                await this.handleFileData(file);
+                fileElem.value = null;
+            },
+            async onFileDrop(event) {
+                event.preventDefault();
+                setTimeout(_ => this.dropHover = false, 50); // stupid blinking
+                const file = event.dataTransfer.files[0];
+                await this.handleFileData(file);
+            },
+            onFileDragEnter() {
+                setTimeout(_ => this.dropHover = true, 0);   // do after "dragleave"
+            },
+            onFileDragLeave() {
+                this.dropHover = false;
+            },
+            onFileDragOver(event) {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "copy";
+            },
+
+            disableDragOverNonThisComponent() {
+                document.querySelector("body").addEventListener("dragover", event => {
+                    if (!this.$el.contains(event.target)) {
+                        event.preventDefault();
+                        event.dataTransfer.dropEffect = "none";
+                    }
+                });
+            }
+        },
+        mounted() {
+            this.disableDragOverNonThisComponent();
+        },
+        components: {
+            "formatted-number": FormattedNumber
+        }
+    };
+
+
+    const HasherItem = {
+        template: `
+          <div class="hasher-item-component"
+               :class="computing ? 'computing' : null">
+          <div class="top">
+            <div class="progress-line"
+                 :style="{width: progress+'%'}"
+            ></div>
+            <div class="name">{{ hasher.githubName }}</div>
+            <div class="compute-buttons">
+              <button
+                  @click="compute"
+                  :disabled="(!hasher.binarySupported && !inputIsString) ||
+                                     (input === null)"
+                  :title="(!hasher.binarySupported ? 'Does not support ArrayBuffer' : null) ||
+                                  (input === null ? 'No selected file' : 'Compute the hash without data splitting (the whole file will be loaded to memory)')"
+              >Compute
+              </button>
+              <button
+                  @click="streamCompute"
+                  :disabled="!hasher.updateSupported || streamMode === 'String' || settings.readerChunkSize < 1"
+                  :title="unsupportedStreamMethodMessage || streamMethodMessage"
+              >Stream Compute
+              </button>
+            </div>
+
+          </div>
+          <div class="middle"
+               :style="{opacity: newInput || !time ? '0.2' : '1'}"
+          >
+            <div class="hash-times">
+              <div class="hash-time"
+                   title="Hashing time"
+              >
+                <span v-if="time"><formatted-number :number="time"/> ms</span>
+              </div>
+              <div class="file-loading-time"
+                   title="Loading to memory time"
+              >
+                <span v-if="loadingToMemoryTime"><formatted-number :number="loadingToMemoryTime"/> ms</span>
+              </div>
+              <div class="total-hash-time"
+                   title="Total time"
+              >
+                <div v-if="totalTime"><formatted-number :number="totalTime"/> ms</div>
+              </div>
+            </div>
+
+          </div>
+          <div class="bottom">
+            <div class="hash"
+                 :style="{
+                   color: newInput ? '#ddd' : '#000',
+                   opacity: hash ? 1 : 0,
+                 }"
+            >{{ hash }}</div>
+          </div>
+          </div>
+        `,
+        created() {
+            bus.$on("input-changed", this.onInputChanged);
+        },
+        props: ["hasher", "input", "settings"],
+        methods: {
+            onInputChanged() {
+                this.newInput = true;
+            },
+            async compute() {
+                this.computing = true;
+                this.time = 0;
+                this.progress = 0;
+                this.$forceUpdate();
+                await new Promise(resolve => setTimeout(resolve, 16));
+
+                let input;
+                if (isString(this.input)) {
+                    input = this.input;
+                } else {
+                    if (!this.hasher.binarySupported) {
+                        return;
+                    }
+                    if (Util.isBlob(this.input)) {
+                        const start = performance.now();
+                        input = await this.input.arrayBuffer();
+                        this.loadingToMemoryTime = performance.now() - start;
+                    } else {
+                        input = this.input;
+                        this.loadingToMemoryTime = this.settings.loadingToMemoryTime;
+                    }
+                    this.$forceUpdate();
+                    await new Promise(resolve => setTimeout(resolve, 16));
+                }
+
+                const start = performance.now();
+                this.hash = this.hasher.hash(input);
+                this.progress = 100;
+                this.time = performance.now() - start;
+                this.newInput = false;
+
+                this.computing = false;
+            },
+            async streamCompute() {
+                this.computing = true;
+                this.progress = 0;
+                await new Promise(resolve => setTimeout(resolve, 16));
+
+                const self = this;
+                this.loadingToMemoryTime = null;
+
+                if (this.streamMode === "FileReader") {
+                    console.log(this.settings.readerChunkSize);
+                    await _hashIterable(Util.iterateBlob2(this.input, this.settings.readerChunkSize), this.input.size);
+                } else if (this.streamMode === "ReadableStream") {
+                    await _hashIterable(Util.iterateReadableStream(this.input.stream()), this.input.size);
+                } else if (this.streamMode === "ArrayBuffer") {
+                    await _hashIterable(Util.iterateArrayBuffer(this.input), this.input.byteLength);
+                }
+                this.newInput = false;
+                this.computing = false;
+
+                async function _hashIterable(iterable, length) {
+                    const hasher = new self.hasher();
+                    const start = performance.now();
+                    let curTime = start;
+                    let totalRead = 0;
+                    const settings = self.settings;
+                    self.progress = 0;
+                    for await (const data of iterable) {
+                        if (settings.animation) {
+                            const newTime = performance.now();
+                            if (newTime - curTime > (1000 / settings.fps)) {
+                                curTime = newTime;
+                                self.progress = (totalRead / length) * 100;
+                                await new Promise(resolve => Util.setImmediate(resolve));
+                            }
+                            totalRead += data.length;
+                        }
+
+                        hasher.update(data);
+                    }
+                    self.progress = 100;
+
+                    self.hash = hasher.finalize();
+                    self.time = performance.now() - start;
+                }
+            }
+        },
+        data() {
+            return {
+                hash: "",
+                time: "",
+                progress: 0,
+                loadingToMemoryTime: null,
+                newInput: true,
+                computing: false,
+            }
+        },
+        computed: {
+            streamMethodMessage() {
+                if (this.streamMode === "ArrayBuffer") {
+                    return "Iterate ArrayBuffer chunks of the file loaded in the memory";
+                }
+                if (this.streamMode === "FileReader") {
+                    return "Stream reading of the file via FileReader";
+                }
+                if (this.streamMode === "ReadableStream") {
+                    return "Stream reading of the file via ReadableStream";
+                }
+            },
+            unsupportedStreamMethodMessage() {
+                if (!this.hasher.updateSupported) {
+                    return "Does not support `update` method";
+                }
+                if (this.streamMode === "String") {
+                    return "I see no sense to use progressive hashing for the text input";
+                }
+            },
+            inputIsString() {
+                return isString(this.input);
+            },
+            totalTime() {
+                if (this.loadingToMemoryTime && this.time) {
+                    return (Number(this.time) + Number(this.loadingToMemoryTime)).toFixed(2);
+                } else {
+                    return null;
+                }
+            },
+            streamMode() {
+                if (isArrayBuffer(this.input)) {
+                    return "ArrayBuffer"
+                } else if (Util.isBlob(this.input)) {
+                    if (this.settings.streamType === "FileReader") {
+                        return "FileReader"
+                    }
+                    if (this.settings.streamType === "ReadableStream") {
+                        return "ReadableStream"
+                    }
+                }
+                return "String";
+            }
+        },
+        components: {
+            "formatted-number": FormattedNumber
+        }
+    };
+
+    const MainContainer = {
+        template: `
+          <div class="main-container-component">
+          <div class="inputs">
+            <div class="text-input">
+              <div class="textarea-wrapper"
+                   :class="{'selected-input': activeInputType === 'text'}">
+                <textarea placeholder="Type a text here" v-model="inputText"/>
+              </div>
+            </div>
+            <div class="file-group">
+              <file-input-drag-n-drop-component
+                  :class="{
+                            'selected-input': activeInputType === 'file'
+                          }"
+                  ref="fileInputComponent"
+                  @file-input-change="onFileInputChange"
+                  :file="inputFile"
+              ></file-input-drag-n-drop-component>
+
+              <div class="settings"
+                   :class="{inactive: activeInputType !== 'file'}">
+                <div class="store-in-memory">
+                  <label>
+                    <input type="checkbox"
+                           v-model="storeInMemory"
+                    > Store in memory {{ binaryLoading ? ' (loadings...)' : '' }}
+                    <span title="loaded in"
+                          v-if="loadingToMemoryTime && storeInMemory && inputBinary !== null"
+                    >(<formatted-number :number="loadingToMemoryTime"/> ms)</span>
+                  </label>
+                </div>
+
+                <div class="stream-type">
+                  <div :style="{opacity: storeInMemory ? 0.5 : 1}">
+                    <label><input type="radio" name="streamType" value="FileReader"
+                                  v-model="streamType"
+                    > FileReader</label>
+                    <label><input type="radio" name="streamType" value="ReadableStream"
+                                  v-model="streamType"
+                    > ReadableStream</label>
+                  </div>
+                  <label title="Chunk size for progressive hashing, Megabytes"
+                         :style="{opacity: streamType === 'ReadableStream' && !storeInMemory ? 0.5 : 1}"
+                  >Chunk size, MB
+                    <input type="number" min="0.1" step="0.1"
+                           v-model="readerChunkSizeMB"
+                           :class="{invalid: readerChunkSize < 1}"
+                           :title="readerChunkSize > 0 ? '' : 'Value must be greater than or equal to 1 byte'"
+                    ></label>
+                </div>
+                <div class="animation">
+                          <span class="checkbox">
+                            <label><input type="checkbox" v-model="animation"> Animation, </label>
+                          </span>
+                  <span class="fps" :style="{opacity: animation ? 1 : 0.5}">
+                            <label>FPS <input type="number" v-model="fps"></label>
+                          </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-switch">
+            <div class="switch-line">
+              Input:
+              <label>
+                <input type="radio" name="input" value="text" v-model="activeInputType"> Text</label>
+              <label>
+                <input type="radio" name="input" value="file" v-model="activeInputType"> File</label>
+              <label
+                  class="input-switch-checkbox"
+                  title="Switch the input type automatically based on the corresponding input change">
+                <input type="checkbox" v-model="activeInputTypeAutoSwitcher"> Auto-Switch</label>
+            </div>
+            <div class="input-info">Input size:
+              <span class="red" v-if="activeInputType === 'file' && inputFile === null">no file selected</span>
+              <span v-else><formatted-number :number="inputByteSize"/> bytes</span>
+            </div>
+          </div>
+
+          <div class="items">
+            <hasher-item-component
+                v-for="(hasher, index) of hashers"
+                :hasher="hasher"
+                :key="index"
+                :input="input"
+                :settings="{
+                  fps,
+                  animation,
+                  readerChunkSize,
+                  streamType,
+                  loadingToMemoryTime
+                }"
+                ref="items"
+            ></hasher-item-component>
+          </div>
+
+          <div class="interface">
+            <button @click="computeAll">Compute all</button>
+            <!-- <button @click="clearInputData">Clear input data</button>-->
+            <!-- <button @click="clearInputText">Clear input text</button>-->
+          </div>
+          </div>
+        `,
+        components: {
+            "hasher-item-component": HasherItem,
+            "file-input-drag-n-drop-component": FileInputDragNDropComponent,
+            "formatted-number": FormattedNumber
+        },
+        data() {
+            return {
+                inputText: "",
+                inputFile: null,
+                inputBinary: null,
+                storeInMemory: false,
+                binaryLoading: false,
+                loadingToMemoryTime: 0,
+                streamType: "FileReader",
+                animation: true,
+                fps: 25,
+                readerChunkSizeMB: 2,
+                activeInputType: "text",
+                activeInputTypeAutoSwitcher: true,
+            }
+        },
+        computed: {
+            inputByteSize() {
+                if (this.activeInputType === "text") {
+                    return new TextEncoder().encode(this.inputText).byteLength;
+                }
+                if (this.activeInputType === "file" && this.inputFile) {
+                    return this.inputFile.size/* || this.inputBinary.byteLength*/;
+                }
+                return 0;
+            },
+            hashers() {
+                const hashers = [];
+                for (const hasher of Object.values(MD5)) {
+                    hashers.push(hasher);
+                }
+                return hashers;
+            },
+            input() {
+                if (this.activeInputType === "file") {
+                    return this.inputBinary || this.inputFile;
+                } else if (this.activeInputType === "text") {
+                    return this.inputText;
+                }
+            },
+            readerChunkSize() {
+                return Math.trunc(Number(this.readerChunkSizeMB) * 1024 * 1024);
+            },
+        },
+        watch: {
+            inputFile() {
+                if (this.activeInputTypeAutoSwitcher) {
+                    this.activeInputType = "file";
+                }
+                bus.$emit("input-changed");
+                this.updateInputBinary();
+            },
+            inputText() {
+                if (this.activeInputTypeAutoSwitcher) {
+                    this.activeInputType = "text";
+                }
+                bus.$emit("input-changed");
+            },
+            activeInputType() {
+                bus.$emit("input-changed");
+            },
+            storeInMemory() {
+                this.updateInputBinary();
+            },
+        },
+        methods: {
+            async computeAll() {
+                bus.$emit("input-changed"); // todo rename
+                for (const item of this.$refs.items) {
+                    await item.compute();
+                    await new Promise(resolve => Util.setImmediate(resolve));
+                }
+            },
+            clearInputData() {
+                this.inputFile = null;
+                this.inputBinary = null;
+            },
+            clearInputText() {
+                this.inputText = "";
+            },
+            async onFileInputChange(file) {
+                this.inputFile = file;
+            },
+            async updateInputBinary() {
+                // load file to the memory
+                if (this.storeInMemory && this.inputFile) {
+                    this.loadingToMemoryTime = null;
+                    this.binaryLoading = true;
+                    const now = performance.now();
+                    this.inputBinary = await this.inputFile.arrayBuffer();                                 // [1]
+                    /* just to compare arrayBuffer() with FileReader */
+                    // this.inputBinary = await (Util.iterateBlob1(this.inputFile, 1024**4).next()).value; // [2]
+                    this.loadingToMemoryTime = performance.now() - now;
+                    this.binaryLoading = false;
+                } else {
+                    this.inputBinary = null;
+                }
+            }
+        }
+    };
+
+    new Vue({
+        el: "#app",
+        components: {
+            "main-container-component": MainContainer
+        }
+    });
+</script>
+
+</body>
+</html>
