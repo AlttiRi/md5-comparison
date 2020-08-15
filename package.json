@@ -11,32 +11,40 @@
   "license": "MIT",
   "scripts": {
     "live-server": "live-server",
-    "build": "npm run browserify:all && npm run rollup:all",
+    "watch-vue": "cd building && node watch.js",
+    "build-vue": "cd building && node build.js",
+    "build-libs": "npm run browserify:all && npm run rollup:all",
     "browserify:all": "npm run browserify:cb-md5 && npm run browserify:node-md5",
-    "browserify:cb-md5": "  browserify js/exposes/cb-md5.cjs.js   -d | exorcist vendor/cb-md5.browserified.js.map   > vendor/cb-md5.browserified.js",
-    "browserify:node-md5": "browserify js/exposes/node-md5.cjs.js -d | exorcist vendor/node-md5.browserified.js.map > vendor/node-md5.browserified.js",
+    "browserify:cb-md5": "  browserify vendor/exposes/cb-md5.cjs.js   -d | exorcist vendor/dist/cb-md5.browserified.js.map   > vendor/dist/cb-md5.browserified.js",
+    "browserify:node-md5": "browserify vendor/exposes/node-md5.cjs.js -d | exorcist vendor/dist/node-md5.browserified.js.map > vendor/dist/node-md5.browserified.js",
     "rollup:all": "npm run rollup:js-md5 && npm run rollup:spark-md5 && npm run rollup:blueimp-md5 && npm run rollup:cryptojs-md5",
-    "rollup:js-md5": "      rollup -i js/exposes/js-md5.es.js       -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/js-md5.rolluped.js",
-    "rollup:spark-md5": "   rollup -i js/exposes/spark-md5.es.js    -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/spark-md5.rolluped.js",
-    "rollup:blueimp-md5": " rollup -i js/exposes/blueimp-md5.es.js  -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/blueimp-md5.rolluped.js",
-    "rollup:cryptojs-md5": "rollup -i js/exposes/cryptojs-md5.es.js -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/cryptojs-md5.rolluped.js",
-    "terser:example": "terser --compress --mangle --source-map \"content='vendor/cryptojs-md5.rolluped.js.map', url='cryptojs-md5.rolluped.min.js.map'\" --output vendor/cryptojs-md5.rolluped.min.js -- vendor/cryptojs-md5.rolluped.js"
+    "rollup:js-md5": "      rollup -i vendor/exposes/js-md5.es.js       -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/dist/js-md5.rolluped.js",
+    "rollup:spark-md5": "   rollup -i vendor/exposes/spark-md5.es.js    -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/dist/spark-md5.rolluped.js",
+    "rollup:blueimp-md5": " rollup -i vendor/exposes/blueimp-md5.es.js  -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/dist/blueimp-md5.rolluped.js",
+    "rollup:cryptojs-md5": "rollup -i vendor/exposes/cryptojs-md5.es.js -f iife -m -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs -o vendor/dist/cryptojs-md5.rolluped.js",
+    "terser:example": "terser --compress --mangle --source-map \\\"content='vendor/cryptojs-md5.rolluped.js.map', url='cryptojs-md5.rolluped.min.js.map'\\\" --output vendor/cryptojs-md5.rolluped.min.js -- vendor/dist/cryptojs-md5.rolluped.js"
   },
   "devDependencies": {
-    "@types/node": "^14.0.22",
-    "rollup": "^2.23.0",
-    "@rollup/plugin-node-resolve": "^8.1.0",
     "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-node-resolve": "^8.1.0",
+    "@rollup/plugin-replace": "^2.3.3",
+    "@types/node": "^14.0.22",
     "browserify": "^16.5.1",
     "exorcist": "^1.0.1",
-    "terser": "^4.8.0"
+    "live-server": "^1.2.1",
+    "magic-string": "^0.25.7",
+    "rollup": "^2.23.0",
+    "rollup-plugin-vue": "^5.1.9",
+    "terser": "^5.0.0",
+    "vue": "^2.6.11",
+    "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {
-    "js-md5": "0.7.3",
-    "md5.js": "1.3.5",
-    "md5": "2.2.1",
-    "spark-md5": "3.0.1",
     "blueimp-md5": "2.16.0",
-    "crypto-js": "3.3.0"
+    "crypto-js": "3.3.0",
+    "js-md5": "0.7.3",
+    "md5": "2.2.1",
+    "md5.js": "1.3.5",
+    "spark-md5": "3.0.1"
   }
 }

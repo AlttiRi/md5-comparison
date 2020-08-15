@@ -1,14 +1,4 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-(function (Buffer){
-globalThis.Buffer = globalThis.Buffer || Buffer;
-globalThis.nodeMD5 = require("md5");
-
-
-// "md5": "2.2.1"
-// https://github.com/pvorb/node-md5
-}).call(this,require("buffer").Buffer)
-
-},{"buffer":3,"md5":8}],2:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -162,7 +152,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 (function (Buffer){
 /*!
  * The buffer module from node.js, for the browser.
@@ -1944,7 +1934,7 @@ function numberIsNaN (obj) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"base64-js":2,"buffer":3,"ieee754":6}],4:[function(require,module,exports){
+},{"base64-js":1,"buffer":2,"ieee754":5}],3:[function(require,module,exports){
 var charenc = {
   // UTF-8 encoding
   utf8: {
@@ -1979,7 +1969,7 @@ var charenc = {
 
 module.exports = charenc;
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function() {
   var base64map
       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
@@ -2077,7 +2067,7 @@ module.exports = charenc;
   module.exports = crypt;
 })();
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -2163,7 +2153,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -2186,7 +2176,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function(){
   var crypt = require('crypt'),
       utf8 = require('charenc').utf8,
@@ -2348,5 +2338,15 @@ function isSlowBuffer (obj) {
 
 })();
 
-},{"charenc":4,"crypt":5,"is-buffer":7}]},{},[1])
+},{"charenc":3,"crypt":4,"is-buffer":6}],8:[function(require,module,exports){
+(function (Buffer){
+globalThis.Buffer = globalThis.Buffer || Buffer;
+globalThis.nodeMD5 = require("md5");
+
+
+// "md5": "2.2.1"
+// https://github.com/pvorb/node-md5
+}).call(this,require("buffer").Buffer)
+
+},{"buffer":2,"md5":7}]},{},[8])
 //# sourceMappingURL=node-md5.browserified.js.map

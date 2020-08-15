@@ -16,23 +16,23 @@
     --hash-text-shadow: #00beff45 0 0 1px;
 }
 
-html, body {
-    min-height: 100vh;
-    margin: 0;
-}
+/*html, body {*/
+/*    min-height: 100vh;*/
+/*    margin: 0;*/
+/*}*/
 
-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
+/*body {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*}*/
 
-.main-container-component {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/*.main-container-component {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*}*/
 
 .main-container-component .items {
     display: flex;

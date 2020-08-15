@@ -1,4 +1,4 @@
-export const setImmediate = (function() {
+export const setImmediate = /*#__PURE__*/ (function() {
     const {port1, port2} = new MessageChannel();
     const queue = [];
 
@@ -17,7 +17,7 @@ export const setImmediate = (function() {
 export async function * iterateReadableStream(stream) {
     const reader = stream.getReader();
     while (true) {
-        const {done, /** @type Uint8Array */ value} = await reader.read();
+        const {done, /** @type {Uint8Array} */ value} = await reader.read();
         if (done) {
             break;
         }
