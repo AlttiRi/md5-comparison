@@ -19,6 +19,8 @@ class Hasher {
 // -
 // http://www.myersdaily.org/joseph/javascript/md5-text.html
 // http://www.myersdaily.org/joseph/javascript/md5.js
+// -
+// https://github.com/cotag/ts-md5
 
 
 class HasherBlueimp extends Hasher {
