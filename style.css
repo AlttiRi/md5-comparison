@@ -1,0 +1,33 @@
+html, body {
+    min-height: 100vh;
+    margin: 0;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+:root {
+    --light-blue: #34b4e3;
+    --dark-blue: #013033;
+    --red: #e30000;
+
+    --drop-hover: rgba(0,0,0,0.03);
+    --drop-active: rgba(0,0,0,0.06);
+    --drop-file-over: rgba(0,0,0,0.06);
+
+    --file-input-drag-n-drop-component-border: black;
+
+    --textarea-wrapper-border: rgba(0,0,0,0.5);
+    --selected-input-border: rgba(0,0,0,0.5);
+    --selected-input-box-shadow: rgba(0,0,0,0.5);
+
+    --hash-text-shadow: #00beff45 0 0 1px;
+}
+
+button {
+    margin: 2px;
+    padding: 5px 6px;
+    min-width: 120px;
+}
