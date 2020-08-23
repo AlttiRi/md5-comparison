@@ -10,6 +10,7 @@
   ],
   "license": "MIT",
   "scripts": {
+    "build": "npm run build-vue && npm run build-libs",
     "live-server": "live-server",
     "watch-vue": "cd building && node watch.js",
     "build-vue": "cd building && node build.js",

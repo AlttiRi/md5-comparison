@@ -48,6 +48,7 @@ jobs:
           git status;
       - name: Move static and generated files && and check files
         run: cp -r ./dist/ ./$folder_name/ &&
+          cp -r ./vendor/ ./$folder_name/ &&
           cp index.html $folder_name/index.html &&
           cp style.css $folder_name/style.css &&
           cd $folder_name && pwd && ls -l &&
