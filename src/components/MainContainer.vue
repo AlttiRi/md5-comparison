@@ -222,5 +222,143 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .inputs {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+
+    > * {
+      margin: 4px 0px;
+    }
+
+    .selected-input {
+      border: solid 1px var(--selected-input-border);
+      box-sizing: border-box;
+      box-shadow: 0 0 10px var(--selected-input-box-shadow);
+    }
+
+    .text-input {
+      display: flex;
+      align-self: stretch;
+      box-sizing: border-box;
+      .textarea-wrapper {
+        border: solid 1px var(--textarea-wrapper-border);
+        box-sizing: border-box;
+        textarea {
+          width: 310px;
+          box-sizing: border-box;
+          display: block;
+          height: 100%;
+          border: 0;
+          outline: none;
+          min-height: 100px;
+          padding: 5px;
+          font-size: 17px;
+          &:focus::placeholder {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+          }
+        }
+      }
+    }
+
+    .file-group {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      > div {
+        width: 312px;
+      }
+
+      .settings {
+        width: 320px;
+        padding: 6px 8px;
+        box-sizing: border-box;
+
+        &.inactive {
+          opacity: 0.5;
+        }
+
+        > * {
+          margin: 6px;
+        }
+
+        input[type="number"] {
+          max-width: 42px;
+
+          &.invalid {
+            border: 2px solid var(--red);
+            outline: none;
+            box-shadow: 0px 0px 1px 0px var(--red);
+          }
+        }
+
+        .stream-type input {
+          margin: 4px;
+        }
+      }
+    }
+  }
+
+  .input-switch {
+    padding: 6px;
+    margin-top: 12px;
+    margin-bottom: 24px;
+    > * {
+      padding: 0px 2px;
+    }
+    > div {
+      padding-bottom: 6px;
+    }
+
+    .input-switch-checkbox {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      &:hover {
+        opacity: 1;
+        transition: opacity 0.25s ease;
+      }
+    }
+  }
+
+  .red {
+    color: var(--red);
+  }
+
+  .items {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .interface {
+    display: flex;
+    justify-content: center;
+    margin: 4px;
+  }
+}
+
+/* scrollbar breaks it a bit for 961px - 974px */
+/* todo use grid */
+@media all and (min-width: 640px) and (max-width: 960px) {
+  .main-container-component .inputs .text-input .textarea-wrapper textarea {
+    width: 630px;
+  }
+}
+
+@media all and (min-width: 960px) {
+  .main-container-component .inputs > * {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
 }
 </style>

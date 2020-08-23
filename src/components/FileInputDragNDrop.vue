@@ -84,3 +84,47 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.file-input-drag-n-drop-component {
+  min-height: 6em;
+  transition: background-color 0.1s;
+  border: solid 1px var(--file-input-drag-n-drop-component-border);
+  box-sizing: border-box;
+
+  &.drop-hover { /*todo: rename - file-over */
+    background-color: var(--drop-file-over);
+    transition: background-color 0.1s;
+  }
+  &:hover {
+    background-color: var(--drop-hover);
+  }
+  &:active {
+    background-color: var(--drop-active);
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .file-info {
+    max-width: 100%;
+    > * {
+      padding: 4px 12px;
+    }
+    .file-name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .file-mtime {
+      opacity: 0.9;
+    }
+  }
+
+  #add-files-button {
+    font-size: 18px;
+  }
+}
+</style>
