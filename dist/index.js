@@ -549,7 +549,8 @@
       },
       totalTime() {
         if (this.loadingToMemoryTime && this.time) {
-          return (Number(this.time) + Number(this.loadingToMemoryTime)).toFixed(2);
+          const total = Number(this.time) + Number(this.loadingToMemoryTime);
+          return Number(total.toFixed(2));
         } else {
           return null;
         }
@@ -730,7 +731,7 @@
     /* style */
     const __vue_inject_styles__$2 = undefined;
     /* scoped */
-    const __vue_scope_id__$2 = "data-v-011933f6";
+    const __vue_scope_id__$2 = "data-v-328014aa";
     /* module identifier */
     const __vue_module_identifier__$2 = undefined;
     /* functional template */
@@ -1667,7 +1668,7 @@
     /* style */
     const __vue_inject_styles__$4 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-3058b591";
+    const __vue_scope_id__$4 = "data-v-9a5331dc";
     /* module identifier */
     const __vue_module_identifier__$4 = undefined;
     /* functional template */
