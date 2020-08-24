@@ -22,9 +22,32 @@
 
 <div id="app"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime.js"></script>
-<!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime.min.js"></script>-->
-<script src="./dist/index.js"></script>
+<script type="module">
+    // Add search param `dev=true` for developer Vue version.
+    // Add search param `min=true` for minified version of the app script.
+    // For example, `dev=true&min=true`
+
+    const url = new URL(location.href);
+    const dev = JSON.parse(url.searchParams.get("dev"));
+    const min = JSON.parse(url.searchParams.get("min"));
+    const isLocalHost = ["localhost", "127.0.0.1"].includes(url.hostname);
+
+    const _dev = dev !== null ? dev : isLocalHost;
+    const _min = min !== null ? min : !_dev;
+
+    Promise.resolve()
+        .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime${_dev ? "" : ".min"}.js`))
+        .then(_ => appendScript(`./dist/index${_min ? ".min" : ""}.js`));
+
+    function appendScript(src) {
+        return new Promise(resolve => {
+            const script = document.createElement("script");
+            script.onload = resolve;
+            script.src = src;
+            document.querySelector("body").append(script);
+        });
+    }
+</script>
 
 </body>
 </html>
