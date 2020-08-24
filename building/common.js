@@ -3,11 +3,11 @@ import {rollup} from "rollup";
 import vue from "rollup-plugin-vue";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
-import {minify} from "terser";
+import {minify as terser} from "terser";
 import fs from "fs/promises";
 
-const dist = "../dist/";
-const filename = "index";
+export const dist = "../dist/";
+export const filename = "index";
 const input = `../src/${filename}.js`;
 
 
@@ -41,18 +41,18 @@ export const outputOptions = {
     sourcemap: true,
 };
 
-export async function build() {
-    const {code, map} = await bundle();
-    const written = write(code, map, filename + ".js");
+export async function build(inputOptions, outputOptions, filename, dist) {
+    const {code, map} = await bundle(inputOptions, outputOptions);
+    const written = write(code, map, filename + ".js", dist);
 
-    const {code: codeMin, map: mapMin} = await _minify(code, map);
-    const writtenMin = write(codeMin, mapMin, filename + ".min.js");
+    const {code: codeMin, map: mapMin} = await minify(code, map, filename);
+    const writtenMin = write(codeMin, mapMin, filename + ".min.js", dist);
 
     return Promise.all([written, writtenMin]);
 }
 
 /** @returns {Promise<{code: String, map: import("rollup").SourceMap}>} */
-async function bundle() {
+export async function bundle(inputOptions, outputOptions) {
     const bundle = await rollup(inputOptions);
     const result = await bundle.generate(outputOptions);
 
@@ -64,22 +64,24 @@ async function bundle() {
     return {code, map};
 }
 
-async function _minify(code, map) {
+/** @returns {Promise<{code: String, map: import("terser").RawSourceMap}>} */
+export async function minify(code, map, filename) {
     /** @type {import("terser").MinifyOptions} */
     const options = {
         sourceMap: {
             content: map,
-            url: filename + ".js.map",
+            url: filename + ".min.js.map",
             includeSources: true,
         },
         compress: false,
-        mangle: false
+        mangle: true
     };
 
-    const result = await minify(code, options);
+    /** @type {{code: string, map: string}} */
+    const result = await terser(code, options);
     return {
         code: result.code,
-        map: result.map
+        map: JSON.parse(result.map)
     };
 }
 
@@ -102,10 +104,10 @@ async function writeVueStyles(cssBundle, stylesMap, meta) {
             return text;
         })
         .reduce((pre, acc) => pre + acc, "");
-    await write(styleBunch, null, `style.css`);
+    await write(styleBunch, null, `style.css`, dist);
 }
 
-export async function write(code, map, name) {
+export async function write(code, map, name, dist) {
     await fs.mkdir(dist, {recursive: true});
     await fs.writeFile(`${dist}${name}`, code);
     if (map) {
@@ -113,6 +115,6 @@ export async function write(code, map, name) {
     }
 }
 
-function sourceMappingURL(name, ext = "js") {
+export function sourceMappingURL(name, ext = "js") {
     return `\n//# sourceMappingURL=${name}.${ext}.map`
 }
