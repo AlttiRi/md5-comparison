@@ -186,7 +186,8 @@ export default {
     },
     totalTime() {
       if (this.loadingToMemoryTime && this.time) {
-        return (Number(this.time) + Number(this.loadingToMemoryTime)).toFixed(2);
+        const total = Number(this.time) + Number(this.loadingToMemoryTime);
+        return Number(total.toFixed(2));
       } else {
         return null;
       }

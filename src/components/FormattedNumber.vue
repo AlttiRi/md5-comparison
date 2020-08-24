@@ -1,6 +1,12 @@
 <!--
   It works OK only with integer numbers and partially with decimal numbers
   (no support of `1.2e-34`, `Infinity`, `NaN`, for example)
+
+  To style it pass `padding` property
+  or use:
+  ... ::v-deep .formatted-number .trio > .padded {
+    letter-spacing: 4px;
+  }
  -->
 <template lang="pug">
 span.formatted-number

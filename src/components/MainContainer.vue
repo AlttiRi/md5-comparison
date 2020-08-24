@@ -215,6 +215,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.main-container-component::v-deep .formatted-number .trio > .padded {
+  letter-spacing: 4px;
+}
+
 .main-container-component {
   display: flex;
   flex-direction: column;
