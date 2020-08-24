@@ -385,6 +385,14 @@
           return new Uint8Array(await blob.arrayBuffer());
       }
   }
+
+
+  function isArrayBuffer(data) {
+      return data instanceof ArrayBuffer;
+  }
+  function isString(data) {
+      return typeof data === "string" || data instanceof String;
+  }
   function isBlob(data) { // is it Blob or File
       return data instanceof Blob;
   }
@@ -722,7 +730,7 @@
     /* style */
     const __vue_inject_styles__$2 = undefined;
     /* scoped */
-    const __vue_scope_id__$2 = "data-v-1e637de0";
+    const __vue_scope_id__$2 = "data-v-011933f6";
     /* module identifier */
     const __vue_module_identifier__$2 = undefined;
     /* functional template */
@@ -910,6 +918,187 @@
       undefined
     );
 
+  /**
+   * A normalised hasher
+   * @abstract
+   */
+  class Hasher {
+      static binarySupported = true;
+      static updateSupported = true;
+  }
+
+  //todo
+  // https://stackoverflow.com/questions/1655769/fastest-md5-implementation-in-javascript
+  // -
+  // https://github.com/gorhill/yamd5.js/blob/master/yamd5.js
+  // -
+  // http://pajhome.org.uk/crypt/md5/md5.html
+  // -
+  // http://www.myersdaily.org/joseph/javascript/md5-text.html
+  // http://www.myersdaily.org/joseph/javascript/md5.js
+  // -
+  // https://github.com/cotag/ts-md5
+
+
+  class HasherBlueimp extends Hasher {
+      static githubName = "blueimp/JavaScript-MD5";
+      static binarySupported = false;
+      static updateSupported = false;
+      static hash(data) {
+          if (!isString(data)) {
+              throw new TypeError("Data must be a string");
+          }
+          return blueimpMD5(data);
+      }
+  }
+
+  class HasherCryptoJS extends Hasher {
+      static githubName = "brix/crypto-js";
+      constructor() {
+          super();
+          this.hasher = CryptoJS.algo.MD5.create();
+      }
+
+      static _consumize(data) {
+          if (isString(data)) {
+              return data;
+          } else if (ArrayBuffer.isView(data) || isArrayBuffer(data)) {
+              return CryptoJS.lib.WordArray.create(data);
+          } else {
+              throw new TypeError("Data must be a string or a buffer");
+          }
+      }
+
+      update(data) {
+          const _data = HasherCryptoJS._consumize(data);
+          this.hasher.update(_data);
+          return this;
+      }
+
+      finalize() {
+          return this.hasher.finalize().toString();
+      }
+
+      static hash(data) {
+          const _data = HasherCryptoJS._consumize(data);
+          return CryptoJS.MD5(_data).toString();
+      }
+  }
+
+  class HasherCbMD5 extends Hasher {
+      static githubName = "crypto-browserify/md5.js";
+      constructor() {
+          super();
+          this.hasher = new CbMD5();
+      }
+
+      _consumize(data) {
+          if (isString(data)) {
+              return data;
+          } else if (ArrayBuffer.isView(data) || isArrayBuffer(data)) {
+              return Buffer.from(data);
+          } else {
+              throw new TypeError("Data must be a string or a buffer");
+          }
+      }
+
+      update(data) {
+          const _data = this._consumize(data);
+          this.hasher.update(_data);
+          return this;
+      }
+
+      finalize() {
+          return this.hasher.digest("hex");
+      }
+
+      static hash(data) {
+          return new HasherCbMD5().update(data).finalize();
+      }
+  }
+
+  class HasherJsMD5 extends Hasher {
+      static githubName = "emn178/js-md5";
+      constructor() {
+          super();
+          this.hasher = JsMD5.create();
+      }
+
+      update(data) {
+          this.hasher.update(data);
+          return this;
+      }
+
+      finalize() {
+          return this.hasher.hex();
+      }
+
+      static hash(data) {
+          return JsMD5(data);
+      }
+  }
+
+  class HasherNodeMD5 extends Hasher {
+      static githubName = "pvorb/node-md5";
+      static updateSupported = false;
+      static _consumize(data) {
+          if (isString(data)) {
+              return data;
+          } else if (ArrayBuffer.isView(data) || isArrayBuffer(data)) {
+              return Buffer.from(data);
+          } else {
+              throw new TypeError("Data must be a string or a buffer");
+          }
+      }
+
+      static hash(data) {
+          return nodeMD5(HasherNodeMD5._consumize(data));
+      }
+  }
+
+  class HasherSparkMD5 extends Hasher {
+      static githubName = "satazor/js-spark-md5";
+      constructor() {
+          super();
+          this.hasher = new SparkMD5.ArrayBuffer();
+      }
+
+      static _consumize(data) {
+          if (isString(data)) {
+              return new TextEncoder().encode(data);
+          }
+          return data;
+      }
+
+      update(data) {
+          const _data = HasherSparkMD5._consumize(data);
+          this.hasher.append(_data);
+          return this;
+      }
+
+      finalize() {
+          return this.hasher.end();
+      }
+
+      static hash(data) {
+          const _data = HasherSparkMD5._consumize(data);
+          return SparkMD5.ArrayBuffer.hash(_data);
+      }
+  }
+
+
+  const MD5 = {};
+  Object.assign(MD5, {
+      Blueimp: HasherBlueimp,
+      CryptoJS: HasherCryptoJS,
+      Browserify: HasherCbMD5,
+      Emn178: HasherJsMD5,
+      Node: HasherNodeMD5,
+      Spark: HasherSparkMD5,
+  });
+  Object.defineProperty(MD5, "list", { get: function() { return Object.values(this); } });
+   // globalThis.MD5 = MD5;
+
   //
 
   var script$4 = {
@@ -946,11 +1135,7 @@
         return 0;
       },
       hashers() {
-        const hashers = [];
-        for (const hasher of Object.values(MD5)) {
-          hashers.push(hasher);
-        }
-        return hashers;
+        return MD5.list;
       },
       input() {
         if (this.activeInputType === "file") {
@@ -1482,7 +1667,7 @@
     /* style */
     const __vue_inject_styles__$4 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-51d8afa4";
+    const __vue_scope_id__$4 = "data-v-3058b591";
     /* module identifier */
     const __vue_module_identifier__$4 = undefined;
     /* functional template */
