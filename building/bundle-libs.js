@@ -2,9 +2,7 @@ import {build, minify, sourceMappingURL, write} from "./common.js";
 import {appendFinally} from "./rollup-plugins.js";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-
 import browserify from "browserify";
-
 
 
 function getInputOptions(input, filename) {
@@ -37,7 +35,7 @@ const outputOptions = {
         const filename = `${hasher}.rolluped`;
 
         console.log(hasher);
-        const done =  await build(getInputOptions(input, filename), outputOptions, filename, dist);
+        const done = await build(getInputOptions(input, filename), outputOptions, filename, dist);
         promises.push(done);
     }
 

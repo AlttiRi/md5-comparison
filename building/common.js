@@ -86,7 +86,6 @@ export async function minify(code, map, filename) {
 }
 
 /**
- *
  * @param {String} cssBundle
  * @param {Map<String, String>} stylesMap
  * @param meta
@@ -104,15 +103,34 @@ async function writeVueStyles(cssBundle, stylesMap, meta) {
             return text;
         })
         .reduce((pre, acc) => pre + acc, "");
-    await write(styleBunch, null, `style.css`, dist);
+    await write(styleBunch, null, "style.css", dist);
 }
+
+const pathsMapping = [
+    ["../node_modules/", "node-modules:///"],
+    ["../", "source-maps:///"],
+];
 
 export async function write(code, map, name, dist) {
     await fs.mkdir(dist, {recursive: true});
     await fs.writeFile(`${dist}${name}`, code);
     if (map) {
-        await fs.writeFile(`${dist}${name}.map`, JSON.stringify(map));
+        let _map = changeSourceMapPaths(map);
+        _map = JSON.stringify(_map);
+        await fs.writeFile(`${dist}${name}.map`, _map);
     }
+}
+
+function changeSourceMapPaths(map) {
+    function _beautify(str) {
+        return pathsMapping.reduce((pre, [value, replacer]) => {
+            return pre.replace(value, replacer)
+        }, str);
+    }
+    for (let i = 0; i < map.sources.length; i++) {
+        map.sources[i] = _beautify(map.sources[i]);
+    }
+    return map;
 }
 
 export function sourceMappingURL(name, ext = "js") {
