@@ -79,7 +79,7 @@ export default {
       await new Promise(resolve => setTimeout(resolve, 16));
 
       let input;
-      if (isString(this.input)) {
+      if (Util.isString(this.input)) {
         input = this.input;
       } else {
         if (!this.hasher.binarySupported) {
@@ -182,7 +182,7 @@ export default {
       }
     },
     inputIsString() {
-      return isString(this.input);
+      return Util.isString(this.input);
     },
     totalTime() {
       if (this.loadingToMemoryTime && this.time) {
@@ -192,7 +192,7 @@ export default {
       }
     },
     streamMode() {
-      if (isArrayBuffer(this.input)) {
+      if (Util.isArrayBuffer(this.input)) {
         return "ArrayBuffer"
       } else if (Util.isBlob(this.input)) {
         if (this.settings.streamType === "FileReader") {

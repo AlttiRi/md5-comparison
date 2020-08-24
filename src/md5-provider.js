@@ -1,10 +1,9 @@
-function isString(data) {
-    return typeof data === "string" || data instanceof String;
-}
-function isArrayBuffer(data) {
-    return data instanceof ArrayBuffer;
-}
+import {isString, isArrayBuffer} from "./util.js";
 
+/**
+ * A normalised hasher
+ * @abstract
+ */
 class Hasher {
     static binarySupported = true;
     static updateSupported = true;
@@ -179,6 +178,6 @@ Object.assign(MD5, {
     Node: HasherNodeMD5,
     Spark: HasherSparkMD5,
 });
-globalThis.MD5 = MD5;
+Object.defineProperty(MD5, "list", { get: function() { return Object.values(this); } });
 
-
+export default MD5; // globalThis.MD5 = MD5;

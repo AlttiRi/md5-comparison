@@ -107,6 +107,7 @@ import FileInputDragNDrop from "./FileInputDragNDrop.vue";
 import FormattedNumber from "./FormattedNumber.vue";
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
+import MD5 from "../md5-provider.js";
 
 export default {
   name: "MainContainer",
@@ -142,11 +143,7 @@ export default {
       return 0;
     },
     hashers() {
-      const hashers = [];
-      for (const hasher of Object.values(MD5)) {
-        hashers.push(hasher);
-      }
-      return hashers;
+      return MD5.list;
     },
     input() {
       if (this.activeInputType === "file") {
