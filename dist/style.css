@@ -125,48 +125,6 @@
 }
 }
 
-/* FileInputDragNDrop.vue */
-.file-input-drag-n-drop-component[data-v-2b87d06f] {
-  min-height: 6em;
-  transition: background-color 0.1s;
-  border: solid 1px var(--file-input-drag-n-drop-component-border);
-  box-sizing: border-box;
-}
-.file-input-drag-n-drop-component.drop-hover[data-v-2b87d06f] {
-  /*todo: rename - file-over */
-  background-color: var(--drop-file-over);
-  transition: background-color 0.1s;
-}
-.file-input-drag-n-drop-component[data-v-2b87d06f]:hover {
-  background-color: var(--drop-hover);
-}
-.file-input-drag-n-drop-component[data-v-2b87d06f]:active {
-  background-color: var(--drop-active);
-}
-.file-input-drag-n-drop-component label[data-v-2b87d06f] {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-.file-input-drag-n-drop-component .file-info[data-v-2b87d06f] {
-  max-width: 100%;
-}
-.file-input-drag-n-drop-component .file-info > *[data-v-2b87d06f] {
-  padding: 4px 12px;
-}
-.file-input-drag-n-drop-component .file-info .file-name[data-v-2b87d06f] {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.file-input-drag-n-drop-component .file-info .file-mtime[data-v-2b87d06f] {
-  opacity: 0.9;
-}
-.file-input-drag-n-drop-component #add-files-button[data-v-2b87d06f] {
-  font-size: 18px;
-}
-
 /* HasherItem.vue */
 .hasher-item-component[data-v-1e637de0] {
   width: 310px;
@@ -245,5 +203,47 @@
 .hasher-item-component[data-v-1e637de0] {
     width: 280px;
 }
+}
+
+/* FileInputDragNDrop.vue */
+.file-input-drag-n-drop-component[data-v-2b87d06f] {
+  min-height: 6em;
+  transition: background-color 0.1s;
+  border: solid 1px var(--file-input-drag-n-drop-component-border);
+  box-sizing: border-box;
+}
+.file-input-drag-n-drop-component.drop-hover[data-v-2b87d06f] {
+  /*todo: rename - file-over */
+  background-color: var(--drop-file-over);
+  transition: background-color 0.1s;
+}
+.file-input-drag-n-drop-component[data-v-2b87d06f]:hover {
+  background-color: var(--drop-hover);
+}
+.file-input-drag-n-drop-component[data-v-2b87d06f]:active {
+  background-color: var(--drop-active);
+}
+.file-input-drag-n-drop-component label[data-v-2b87d06f] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.file-input-drag-n-drop-component .file-info[data-v-2b87d06f] {
+  max-width: 100%;
+}
+.file-input-drag-n-drop-component .file-info > *[data-v-2b87d06f] {
+  padding: 4px 12px;
+}
+.file-input-drag-n-drop-component .file-info .file-name[data-v-2b87d06f] {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.file-input-drag-n-drop-component .file-info .file-mtime[data-v-2b87d06f] {
+  opacity: 0.9;
+}
+.file-input-drag-n-drop-component #add-files-button[data-v-2b87d06f] {
+  font-size: 18px;
 }
 
