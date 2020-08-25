@@ -1,45 +1,8 @@
-import {appendFinally, css} from "./rollup-plugins.js";
 import {rollup} from "rollup";
-import vue from "rollup-plugin-vue";
-import replace from "@rollup/plugin-replace";
-import resolve from "@rollup/plugin-node-resolve";
 import {minify as terser} from "terser";
 import fs from "fs/promises";
+import {pathsMapping} from "./settings.js";
 
-export const dist = "../dist/";
-export const filename = "index";
-const input = `../src/${filename}.js`;
-
-
-export const inputOptions = {
-    input,
-    plugins: [
-        css(writeVueStyles),
-        vue({
-            css: false,
-            needMap: true,
-        }),
-        replace({
-            "process.env.NODE_ENV": "\"production\"" // or "develop" // needed only if you bundle Vue in
-        }),
-        resolve({
-            browser: true
-        }),
-        appendFinally(sourceMappingURL(filename))
-    ],
-    external: ["vue"], // I load it from CDN
-};
-
-/**
- * @type {import("rollup").OutputOptions}
- */
-export const outputOptions = {
-    format: "iife",
-    globals: {
-        "vue": "Vue"
-    },
-    sourcemap: true,
-};
 
 export async function build(inputOptions, outputOptions, filename, dist) {
     const {code, map} = await bundle(inputOptions, outputOptions);
@@ -85,31 +48,28 @@ export async function minify(code, map, filename) {
     };
 }
 
-/**
- * @param {String} cssBundle
- * @param {Map<String, String>} stylesMap
- * @param meta
- * @returns {Promise<void>}
- */
-async function writeVueStyles(cssBundle, stylesMap, meta) {
-    const styleBunch = [...stylesMap.values()]
-        .filter(text => text.trim())
-        .map(text => {
-            if (text.includes("sourceMappingURL")) {
-                const style = text.match(/[\s\S]+(?=\/\*# sourceMappingURL)/)[0];
-                const filename = text.match(/(?<=\/\*# sourceMappingURL=).+(?=\.map \*\/)/)[0];
-                return "/* " + filename + " */\n" + style;
-            }
-            return text;
-        })
-        .reduce((pre, acc) => pre + acc, "");
-    await write(styleBunch, null, "style.css", dist);
+export function getVueStylesWriter(name, dist) {
+    /**
+     * @param {String} cssBundle
+     * @param {Map<String, String>} stylesMap
+     * @param meta
+     * @returns {Promise<void>}
+     */
+    return async function writeVueStyles(cssBundle, stylesMap, meta) {
+        const styleBunch = [...stylesMap.values()]
+            .filter(text => text.trim())
+            .map(text => {
+                if (text.includes("sourceMappingURL")) {
+                    const style = text.match(/[\s\S]+(?=\/\*# sourceMappingURL)/)[0];
+                    const filename = text.match(/(?<=\/\*# sourceMappingURL=).+(?=\.map \*\/)/)[0];
+                    return "/* " + filename + " */\n" + style;
+                }
+                return text;
+            })
+            .reduce((pre, acc) => pre + acc, "");
+        await write(styleBunch, null, name, dist);
+    }
 }
-
-const pathsMapping = [
-    ["../node_modules/", "node-modules:///"],
-    ["../", "source-maps:///"],
-];
 
 export async function write(code, map, name, dist) {
     await fs.mkdir(dist, {recursive: true});

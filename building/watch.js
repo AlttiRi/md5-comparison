@@ -1,5 +1,6 @@
 import {watch} from "rollup";
-import {inputOptions, outputOptions, build, write} from "./common.js";
+import {build, write} from "./common.js";
+import {inputOptions, outputOptions} from "./settings.js";
 
 const watchOptions = {
     ...inputOptions,

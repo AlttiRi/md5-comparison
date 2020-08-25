@@ -4,7 +4,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import browserify from "browserify";
 
-
+/** @returns {import("rollup").InputOptions} */
 function getInputOptions(input, filename) {
     return {
         input,
@@ -24,6 +24,7 @@ const outputOptions = {
     sourcemap: true
 };
 
+
 !async function main() {
     const promises = [];
 
@@ -34,11 +35,10 @@ const outputOptions = {
         const input = `../vendor/exposes/${hasher}.es.js`;
         const filename = `${hasher}.rolluped`;
 
-        console.log(hasher);
+        console.log(`[${hasher}]`);
         const done = await build(getInputOptions(input, filename), outputOptions, filename, dist);
         promises.push(done);
     }
-
 
     const hashers2 = ["cb-md5", "node-md5"];
 
@@ -46,9 +46,9 @@ const outputOptions = {
         const input = `../vendor/exposes/${hasher}.cjs.js`;
         const filename = `${hasher}.browserified`;
 
-        console.log(hasher);
-        const b = browserify(input,{debug: true});
-        const output = await new Promise(resolve => b.bundle((error, body) => resolve(body.toString())));
+        console.log(`[${hasher}]`);
+        const bs = browserify(input, {debug: true});
+        const output = await new Promise(resolve => bs.bundle((error, body) => resolve(body.toString())));
 
         const sourceMappingString = "//# sourceMappingURL=data:application/json;charset=utf-8;base64,"
         const offset = output.lastIndexOf(sourceMappingString);
@@ -64,5 +64,6 @@ const outputOptions = {
 
         promises.push(written, writtenMin);
     }
+
     await Promise.all(promises);
 }();
