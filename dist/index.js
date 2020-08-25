@@ -593,11 +593,9 @@
             staticClass: "progress-line",
             style: { width: _vm.progress + "%" }
           }),
-          _vm._v(" "),
           _c("div", { staticClass: "name" }, [
             _vm._v(_vm._s(_vm.hasher.githubName))
           ]),
-          _vm._v(" "),
           _c("div", { staticClass: "compute-buttons" }, [
             _c(
               "button",
@@ -616,9 +614,8 @@
                 },
                 on: { click: _vm.compute }
               },
-              [_vm._v("Compute\n      ")]
+              [_vm._v("Compute")]
             ),
-            _vm._v(" "),
             _c(
               "button",
               {
@@ -632,11 +629,10 @@
                 },
                 on: { click: _vm.streamCompute }
               },
-              [_vm._v("Stream Compute\n      ")]
+              [_vm._v("Stream Compute")]
             )
           ])
         ]),
-        _vm._v(" "),
         _c(
           "div",
           {
@@ -654,14 +650,13 @@
                         "span",
                         [
                           _c("FormattedNumber", { attrs: { number: _vm.time } }),
-                          _vm._v(" ms")
+                          _vm._v("\nms")
                         ],
                         1
                       )
                     : _vm._e()
                 ]
               ),
-              _vm._v(" "),
               _c(
                 "div",
                 {
@@ -676,14 +671,13 @@
                           _c("FormattedNumber", {
                             attrs: { number: _vm.loadingToMemoryTime }
                           }),
-                          _vm._v(" ms")
+                          _vm._v("\nms")
                         ],
                         1
                       )
                     : _vm._e()
                 ]
               ),
-              _vm._v(" "),
               _c(
                 "div",
                 {
@@ -698,7 +692,7 @@
                           _c("FormattedNumber", {
                             attrs: { number: _vm.totalTime }
                           }),
-                          _vm._v(" ms")
+                          _vm._v("\nms")
                         ],
                         1
                       )
@@ -708,7 +702,6 @@
             ])
           ]
         ),
-        _vm._v(" "),
         _c("div", { staticClass: "bottom" }, [
           _c(
             "div",
@@ -731,7 +724,7 @@
     /* style */
     const __vue_inject_styles__$2 = undefined;
     /* scoped */
-    const __vue_scope_id__$2 = "data-v-328014aa";
+    const __vue_scope_id__$2 = "data-v-5e193489";
     /* module identifier */
     const __vue_module_identifier__$2 = undefined;
     /* functional template */
@@ -850,13 +843,11 @@
                   2
                 )
               : _vm._e(),
-            _vm._v(" "),
             _c("input", {
               staticStyle: { display: "none" },
               attrs: { id: "file-input", type: "file", accept: "*/*" },
               on: { change: _vm.onFileInputChange }
             }),
-            _vm._v(" "),
             _c("div", { staticClass: "file-info" }, [
               _vm.file
                 ? _c(
@@ -865,13 +856,11 @@
                     [_vm._v(_vm._s(_vm.file.name))]
                   )
                 : _vm._e(),
-              _vm._v(" "),
               _vm.file
                 ? _c("div", { staticClass: "file-size" }, [
                     _vm._v(_vm._s(_vm.bytesToSize(_vm.file.size)))
                   ])
                 : _vm._e(),
-              _vm._v(" "),
               _vm.file
                 ? _c("div", { staticClass: "file-mtime" }, [
                     _vm._v(
@@ -893,7 +882,7 @@
     /* style */
     const __vue_inject_styles__$3 = undefined;
     /* scoped */
-    const __vue_scope_id__$3 = "data-v-2b87d06f";
+    const __vue_scope_id__$3 = "data-v-4f639da6";
     /* module identifier */
     const __vue_module_identifier__$3 = undefined;
     /* functional template */
@@ -1223,30 +1212,31 @@
               class: { "selected-input": _vm.activeInputType === "text" }
             },
             [
-              _c("textarea", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.inputText,
-                    expression: "inputText"
-                  }
-                ],
-                attrs: { placeholder: "Type a text here" },
-                domProps: { value: _vm.inputText },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+              _c("label", [
+                _c("textarea", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.inputText,
+                      expression: "inputText"
                     }
-                    _vm.inputText = $event.target.value;
+                  ],
+                  attrs: { placeholder: "Type a text here" },
+                  domProps: { value: _vm.inputText },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.inputText = $event.target.value;
+                    }
                   }
-                }
-              })
+                })
+              ])
             ]
           )
         ]),
-        _vm._v(" "),
         _c(
           "div",
           { staticClass: "file-group" },
@@ -1257,7 +1247,6 @@
               attrs: { file: _vm.inputFile },
               on: { "file-input-change": _vm.onFileInputChange }
             }),
-            _vm._v(" "),
             _c(
               "div",
               {
@@ -1305,9 +1294,8 @@
                       }
                     }),
                     _vm._v(
-                      " Store in memory " +
-                        _vm._s(_vm.binaryLoading ? " (loadings...)" : "") +
-                        "\n            "
+                      "Store in memory " +
+                        _vm._s(_vm.binaryLoading ? " (loadings...)" : "")
                     ),
                     _vm.loadingToMemoryTime &&
                     _vm.storeInMemory &&
@@ -1320,14 +1308,13 @@
                             _c("FormattedNumber", {
                               attrs: { number: _vm.loadingToMemoryTime }
                             }),
-                            _vm._v(" ms)")
+                            _vm._v("\nms)")
                           ],
                           1
                         )
                       : _vm._e()
                   ])
                 ]),
-                _vm._v(" "),
                 _c("div", { staticClass: "stream-type" }, [
                   _c("div", { style: { opacity: _vm.storeInMemory ? 0.5 : 1 } }, [
                     _c("label", [
@@ -1354,9 +1341,8 @@
                           }
                         }
                       }),
-                      _vm._v(" FileReader")
+                      _vm._v("FileReader")
                     ]),
-                    _vm._v(" "),
                     _c("label", [
                       _c("input", {
                         directives: [
@@ -1381,10 +1367,9 @@
                           }
                         }
                       }),
-                      _vm._v(" ReadableStream")
+                      _vm._v("ReadableStream")
                     ])
                   ]),
-                  _vm._v(" "),
                   _c(
                     "label",
                     {
@@ -1400,7 +1385,7 @@
                       }
                     },
                     [
-                      _vm._v("Chunk size, MB\n            "),
+                      _vm._v("Chunk size, MB"),
                       _c("input", {
                         directives: [
                           {
@@ -1433,7 +1418,6 @@
                     ]
                   )
                 ]),
-                _vm._v(" "),
                 _c("div", { staticClass: "animation" }, [
                   _c("span", { staticClass: "checkbox" }, [
                     _c("label", [
@@ -1474,10 +1458,9 @@
                           }
                         }
                       }),
-                      _vm._v(" Animation, ")
+                      _vm._v("Animation,\n")
                     ])
                   ]),
-                  _vm._v(" "),
                   _c(
                     "span",
                     {
@@ -1486,7 +1469,7 @@
                     },
                     [
                       _c("label", [
-                        _vm._v("FPS "),
+                        _vm._v("FPS"),
                         _c("input", {
                           directives: [
                             {
@@ -1517,10 +1500,9 @@
           1
         )
       ]),
-      _vm._v(" "),
       _c("div", { staticClass: "input-switch" }, [
         _c("div", { staticClass: "switch-line" }, [
-          _vm._v("\n      Input:\n      "),
+          _vm._v("Input:"),
           _c("label", [
             _c("input", {
               directives: [
@@ -1539,9 +1521,8 @@
                 }
               }
             }),
-            _vm._v(" Text")
+            _vm._v("Text")
           ]),
-          _vm._v(" "),
           _c("label", [
             _c("input", {
               directives: [
@@ -1560,9 +1541,8 @@
                 }
               }
             }),
-            _vm._v(" File")
+            _vm._v("File")
           ]),
-          _vm._v(" "),
           _c(
             "label",
             {
@@ -1611,28 +1591,24 @@
                   }
                 }
               }),
-              _vm._v(" Auto-Switch")
+              _vm._v("Auto-Switch")
             ]
           )
         ]),
-        _vm._v(" "),
         _c("div", { staticClass: "input-info" }, [
-          _vm._v("Input size:\n      "),
+          _vm._v("Input size:\n"),
           _vm.activeInputType === "file" && _vm.inputFile === null
             ? _c("span", { staticClass: "red" }, [_vm._v("no file selected")])
             : _c(
                 "span",
                 [
-                  _c("formatted-number", {
-                    attrs: { number: _vm.inputByteSize }
-                  }),
-                  _vm._v(" bytes")
+                  _c("FormattedNumber", { attrs: { number: _vm.inputByteSize } }),
+                  _vm._v("\nbytes")
                 ],
                 1
               )
         ])
       ]),
-      _vm._v(" "),
       _c(
         "div",
         { staticClass: "items" },
@@ -1656,7 +1632,6 @@
         }),
         1
       ),
-      _vm._v(" "),
       _c("div", { staticClass: "interface" }, [
         _c("button", { on: { click: _vm.computeAll } }, [_vm._v("Compute all")])
       ])
@@ -1668,7 +1643,7 @@
     /* style */
     const __vue_inject_styles__$4 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-9a5331dc";
+    const __vue_scope_id__$4 = "data-v-14077e7a";
     /* module identifier */
     const __vue_module_identifier__$4 = undefined;
     /* functional template */
