@@ -1,6 +1,7 @@
 import {watch} from "rollup";
-import {build, write} from "./common.js";
-import {inputOptions, outputOptions} from "./settings.js";
+import {write} from "./common.js";
+import {bundle} from "./bundle.js";
+import {inputOptions, outputOptions, dist} from "./settings.js";
 
 const watchOptions = {
     ...inputOptions,
@@ -21,7 +22,7 @@ const watcher = watch(watchOptions);
 watcher.on("event", async event => {
     if (event.code === "START") {
         console.time("rebuilt");
-        await build();
+        await bundle(true);
         console.timeEnd("rebuilt");
     }
 });
@@ -31,7 +32,7 @@ watcher.on("event", async event => {
 //     console.log(event);
 //     if (event.code === "BUNDLE_END") {
 //         const res = await event.result.generate(outputOptions);
-//         await write(res.output[0].code, res.output[0].map, "index.js");
+//         await write(res.output[0].code, res.output[0].map, "index.js", dist);
 //     }
 // });
 

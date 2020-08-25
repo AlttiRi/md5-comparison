@@ -13,7 +13,7 @@
     "watch:vue": "cd building && node watch.js",
     "live-server": "live-server",
     "build": "npm run build:vue && npm run build:libs",
-    "build:vue": "cd building && node build.js",
+    "build:vue": "cd building && node bundle.js",
     "build:libs": "cd building && node bundle-libs.js"
   },
   "devDependencies": {

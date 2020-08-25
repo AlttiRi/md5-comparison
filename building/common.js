@@ -4,14 +4,20 @@ import fs from "fs/promises";
 import {pathsMapping} from "./settings.js";
 
 
-export async function build(inputOptions, outputOptions, filename, dist) {
+export async function build(inputOptions, outputOptions, filename, dist, skipMinifying) {
+    const promises = [];
     const {code, map} = await bundle(inputOptions, outputOptions);
     const written = write(code, map, filename + ".js", dist);
+    promises.push(written);
 
-    const {code: codeMin, map: mapMin} = await minify(code, map, filename);
-    const writtenMin = write(codeMin, mapMin, filename + ".min.js", dist);
+    if (!skipMinifying) {
+        const {code: codeMin, map: mapMin} = await minify(code, map, filename);
+        const writtenMin = write(codeMin, mapMin, filename + ".min.js", dist);
+        promises.push(writtenMin);
+    }
 
-    return Promise.all([written, writtenMin]);
+
+    return Promise.all(promises);
 }
 
 /** @returns {Promise<{code: String, map: import("rollup").SourceMap}>} */
