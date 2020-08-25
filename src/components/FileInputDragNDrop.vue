@@ -1,27 +1,23 @@
-<template>
-  <div class="file-input-drag-n-drop-component"
-       v-bind:class="{'drop-hover': dropHover}"
-       @drop="onFileDrop"
-       @dragenter="onFileDragEnter"
-       @dragleave="onFileDragLeave"
-       @dragover="onFileDragOver"
-  >
-    <label for="file-input" style="width: 100%; height: 100%;">
-      <div id="add-files-button" v-if="!file">
-        <slot>Select file</slot>
-      </div>
-      <input
-          id="file-input" type="file" accept="*/*" style="display: none"
-          @change="onFileInputChange"
-      >
-      <div class="file-info">
-        <div class="file-name" v-if="file" :title="file.name">{{ file.name }}</div>
-        <div class="file-size" v-if="file">{{ bytesToSize(file.size) }}</div>
-        <div class="file-mtime" v-if="file">{{ secondsToFormattedString(file.lastModified / 1000) }}</div>
-      </div>
-
-    </label>
-  </div>
+<template lang="pug">
+div.file-input-drag-n-drop-component(
+    v-bind:class="{'drop-hover': dropHover}"
+    @drop="onFileDrop"
+    @dragenter="onFileDragEnter"
+    @dragleave="onFileDragLeave"
+    @dragover="onFileDragOver")
+  label(for="file-input" style="width: 100%; height: 100%;")
+    div#add-files-button(v-if="!file")
+      slot
+        | Select file
+    input(id="file-input" type="file" accept="*/*" style="display: none"
+          @change="onFileInputChange")
+    div.file-info
+      div.file-name(v-if="file" :title="file.name")
+        | {{ file.name }}
+      div.file-size(v-if="file")
+        | {{ bytesToSize(file.size) }}
+      div.file-mtime(v-if="file")
+        | {{ secondsToFormattedString(file.lastModified / 1000) }}
 </template>
 
 <script>

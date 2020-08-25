@@ -1,104 +1,104 @@
-<template>
-  <div class="main-container-component">
-    <div class="inputs">
-      <div class="text-input">
-        <div class="textarea-wrapper"
-             :class="{'selected-input': activeInputType === 'text'}">
-          <textarea placeholder="Type a text here" v-model="inputText"/>
-        </div>
-      </div>
-      <div class="file-group">
-        <FileInputDragNDrop
-            :class="{'selected-input': activeInputType === 'file'}"
-            ref="fileInputComponent"
-            @file-input-change="onFileInputChange"
-            :file="inputFile"
-        ></FileInputDragNDrop>
+<template lang="pug">
+div.main-container-component
+  div.inputs
+    div.text-input
+      div.textarea-wrapper(:class="{'selected-input': activeInputType === 'text'}")
+        label
+          textarea(placeholder="Type a text here" v-model="inputText")
+    div.file-group
+      FileInputDragNDrop(
+          :class="{'selected-input': activeInputType === 'file'}"
+          ref="fileInputComponent"
+          @file-input-change="onFileInputChange"
+          :file="inputFile")
 
-        <div class="settings"
-             :class="{inactive: activeInputType !== 'file'}">
-          <div class="store-in-memory">
-            <label>
-              <input type="checkbox"
-                     v-model="storeInMemory"
-              > Store in memory {{ binaryLoading ? ' (loadings...)' : '' }}
-              <span title="loaded in"
-                    v-if="loadingToMemoryTime && storeInMemory && inputBinary !== null"
-              >(<FormattedNumber :number="loadingToMemoryTime"/> ms)</span>
-            </label>
-          </div>
+      div.settings(:class="{inactive: activeInputType !== 'file'}")
+        div.store-in-memory
+          label
+            input(type="checkbox" v-model="storeInMemory")
+            | Store in memory {{ binaryLoading ? ' (loadings...)' : '' }}
+            span(title="loaded in" v-if="loadingToMemoryTime && storeInMemory && inputBinary !== null")
+              | (
+              FormattedNumber(:number="loadingToMemoryTime")
+              |
+              | ms)
 
-          <div class="stream-type">
-            <div :style="{opacity: storeInMemory ? 0.5 : 1}">
-              <label><input type="radio" name="streamType" value="FileReader"
-                            v-model="streamType"
-              > FileReader</label>
-              <label><input type="radio" name="streamType" value="ReadableStream"
-                            v-model="streamType"
-              > ReadableStream</label>
-            </div>
-            <label title="Chunk size for progressive hashing, Megabytes"
-                   :style="{opacity: streamType === 'ReadableStream' && !storeInMemory ? 0.5 : 1}"
-            >Chunk size, MB
-              <input type="number" min="0.1" step="0.1"
-                     v-model="readerChunkSizeMB"
-                     :class="{invalid: readerChunkSize < 1}"
-                     :title="readerChunkSize > 0 ? '' : 'Value must be greater than or equal to 1 byte'"
-              ></label>
-          </div>
-          <div class="animation">
-            <span class="checkbox">
-              <label><input type="checkbox" v-model="animation"> Animation, </label>
-            </span>
-            <span class="fps" :style="{opacity: animation ? 1 : 0.5}">
-              <label>FPS <input type="number" v-model="fps"></label>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+        div.stream-type
+          div(:style="{opacity: storeInMemory ? 0.5 : 1}")
+            label
+              input(type="radio" name="streamType" value="FileReader" v-model="streamType")
+              | FileReader
+            label
+              input(type="radio" name="streamType" value="ReadableStream" v-model="streamType")
+              | ReadableStream
 
-    <div class="input-switch">
-      <div class="switch-line">
-        Input:
-        <label>
-          <input type="radio" name="input" value="text" v-model="activeInputType"> Text</label>
-        <label>
-          <input type="radio" name="input" value="file" v-model="activeInputType"> File</label>
-        <label
-            class="input-switch-checkbox"
-            title="Switch the input type automatically based on the corresponding input change">
-          <input type="checkbox" v-model="activeInputTypeAutoSwitcher"> Auto-Switch</label>
-      </div>
-      <div class="input-info">Input size:
-        <span class="red" v-if="activeInputType === 'file' && inputFile === null">no file selected</span>
-        <span v-else><formatted-number :number="inputByteSize"/> bytes</span>
-      </div>
-    </div>
+          label(
+              title="Chunk size for progressive hashing, Megabytes"
+              :style="{opacity: streamType === 'ReadableStream' && !storeInMemory ? 0.5 : 1}")
+            | Chunk size, MB
+            input(
+                type="number" min="0.1" step="0.1"
+                v-model="readerChunkSizeMB"
+                :class="{invalid: readerChunkSize < 1}"
+                :title="readerChunkSize > 0 ? '' : 'Value must be greater than or equal to 1 byte'")
 
-    <div class="items">
-      <HasherItem
-          v-for="(hasher, index) of hashers"
-          :hasher="hasher"
-          :key="index"
-          :input="input"
-          :settings="{
-            fps,
-            animation,
-            readerChunkSize,
-            streamType,
-            loadingToMemoryTime
-          }"
-          ref="items"
-      ></HasherItem>
-    </div>
+        div.animation
+          span.checkbox
+            label
+              input(type="checkbox" v-model="animation")
+              | Animation,
+              |
+          span.fps(:style="{opacity: animation ? 1 : 0.5}")
+            label
+              | FPS
+              input(type="number" v-model="fps")
 
-    <div class="interface">
-      <button @click="computeAll">Compute all</button>
-      <!-- <button @click="clearInputData">Clear input data</button>-->
-      <!-- <button @click="clearInputText">Clear input text</button>-->
-    </div>
-  </div>
+  div.input-switch
+    div.switch-line
+      | Input:
+      label
+        input(type="radio" name="input" value="text" v-model="activeInputType")
+        | Text
+      label
+        input(type="radio" name="input" value="file" v-model="activeInputType")
+        | File
+      label(
+          class="input-switch-checkbox"
+          title="Switch the input type automatically based on the corresponding input change")
+        input(type="checkbox" v-model="activeInputTypeAutoSwitcher")
+        | Auto-Switch
+    div.input-info
+      | Input size:
+      |
+      span(class="red" v-if="activeInputType === 'file' && inputFile === null")
+        | no file selected
+      span(v-else)
+        FormattedNumber(:number="inputByteSize")
+        |
+        | bytes
+
+  div.items
+    HasherItem(
+        v-for="(hasher, index) of hashers"
+        :hasher="hasher"
+        :key="index"
+        :input="input"
+        :settings=`{
+          fps,
+          animation,
+          readerChunkSize,
+          streamType,
+          loadingToMemoryTime
+        }`
+        ref="items")
+
+  div.interface
+    button(@click="computeAll")
+      | Compute all
+    //button(@click="clearInputData")
+    //  | Clear input data
+    //button(@click="clearInputText")
+    //  | Clear input text
 </template>
 
 <script>
@@ -293,16 +293,14 @@ export default {
 
         input[type="number"] {
           max-width: 42px;
+          margin-left: 4px;
+          margin-top: 4px;
 
           &.invalid {
             border: 2px solid var(--red);
             outline: none;
             box-shadow: 0px 0px 1px 0px var(--red);
           }
-        }
-
-        .stream-type input {
-          margin: 4px;
         }
       }
     }

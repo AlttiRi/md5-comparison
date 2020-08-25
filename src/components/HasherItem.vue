@@ -1,60 +1,50 @@
-<template>
-  <div class="hasher-item-component"
-       :class="computing ? 'computing' : null">
-    <div class="top">
-      <div class="progress-line"
-           :style="{width: progress+'%'}"
-      ></div>
-      <div class="name">{{ hasher.githubName }}</div>
-      <div class="compute-buttons">
-        <button
-            @click="compute"
-            :disabled="(!hasher.binarySupported && !inputIsString) ||
-                                     (input === null)"
-            :title="(!hasher.binarySupported ? 'Does not support ArrayBuffer' : null) ||
-                                  (input === null ? 'No selected file' : 'Compute the hash without data splitting (the whole file will be loaded to memory)')"
-        >Compute
-        </button>
-        <button
-            @click="streamCompute"
-            :disabled="!hasher.updateSupported || streamMode === 'String' || settings.readerChunkSize < 1"
-            :title="unsupportedStreamMethodMessage || streamMethodMessage"
-        >Stream Compute
-        </button>
-      </div>
+<template lang="pug">
+div.hasher-item-component(:class="computing ? 'computing' : null")
 
-    </div>
-    <div class="middle"
-         :style="{opacity: newInput || !time ? '0.2' : '1'}"
-    >
-      <div class="hash-times">
-        <div class="hash-time"
-             title="Hashing time"
-        >
-          <span v-if="time"><FormattedNumber :number="time"/> ms</span>
-        </div>
-        <div class="file-loading-time"
-             title="Loading to memory time"
-        >
-          <span v-if="loadingToMemoryTime"><FormattedNumber :number="loadingToMemoryTime"/> ms</span>
-        </div>
-        <div class="total-hash-time"
-             title="Total time"
-        >
-          <div v-if="totalTime"><FormattedNumber :number="totalTime"/> ms</div>
-        </div>
-      </div>
+  div.top
+    div.progress-line(:style="{width: progress+'%'}")
+    div.name
+      | {{ hasher.githubName }}
+    div.compute-buttons
+      button(
+          @click="compute"
+          :disabled="(!hasher.binarySupported && !inputIsString) || (input === null)"
+          :title=`(!hasher.binarySupported ? 'Does not support ArrayBuffer' : null) ||
+                  (input === null ?
+                     'No selected file' :
+                     'Compute the hash without data splitting (the whole file will be loaded to memory)')`)
+        | Compute
+      button(
+          @click="streamCompute"
+          :disabled="!hasher.updateSupported || streamMode === 'String' || settings.readerChunkSize < 1"
+          :title="unsupportedStreamMethodMessage || streamMethodMessage")
+        | Stream Compute
 
-    </div>
-    <div class="bottom">
-      <div class="hash"
-           :style="{
-                   color: newInput ? '#ddd' : '#000',
-                   opacity: hash ? 1 : 0,
-                 }"
-      >{{ hash }}</div>
-    </div>
-  </div>
+  div.middle(:style="{opacity: newInput || !time ? '0.2' : '1'}")
+    div.hash-times
+      div.hash-time(title="Hashing time")
+        span(v-if="time")
+          FormattedNumber(:number="time")
+          |
+          | ms
+      div.file-loading-time(title="Loading to memory time")
+        span(v-if="loadingToMemoryTime")
+          FormattedNumber(:number="loadingToMemoryTime")
+          |
+          | ms
+      div.total-hash-time(title="Total time")
+        div(v-if="totalTime")
+          FormattedNumber(:number="totalTime")
+          |
+          | ms
+
+  div.bottom
+    div.hash(
+        :style=`{
+          color: newInput ? '#ddd' : '#000',
+          opacity: hash ? 1 : 0,
+        }`)
+      | {{ hash }}
 </template>
 
 <script>
