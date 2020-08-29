@@ -5,7 +5,7 @@ div.file-input-drag-n-drop-component(
     @dragenter="onFileDragEnter"
     @dragleave="onFileDragLeave"
     @dragover="onFileDragOver")
-  label(for="file-input" style="width: 100%; height: 100%;")
+  label(for="file-input")
     div#add-files-button(v-if="!file")
       slot
         | Select file
@@ -85,7 +85,6 @@ export default {
 
 <style lang="scss" scoped>
 .file-input-drag-n-drop-component {
-  min-height: 6em;
   transition: background-color 0.1s;
   border: solid 1px var(--file-input-drag-n-drop-component-border);
   box-sizing: border-box;
@@ -102,6 +101,8 @@ export default {
   }
 
   label {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;

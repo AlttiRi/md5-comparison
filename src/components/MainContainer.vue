@@ -1,7 +1,7 @@
 <template lang="pug">
 div.main-container-component
   div.inputs
-    div.text-input
+    div.text-input-wrapper
       TextInput(:class="{'selected-input': activeInputType === 'text'}")
     div.file-group
       FileInputDragNDrop(
@@ -228,9 +228,10 @@ export default {
       box-shadow: 0 0 10px var(--selected-input-box-shadow);
     }
 
-    .text-input {
+    .text-input-wrapper {
       display: flex;
       align-self: stretch;
+      width: 312px;
     }
 
     .file-group {
@@ -242,6 +243,7 @@ export default {
 
       > div {
         width: 312px;
+        min-height: 6em;
       }
 
       .settings {
@@ -312,13 +314,13 @@ export default {
   }
 }
 
-///* scrollbar breaks it a bit for 961px - 974px */
-///* todo use grid */
-//@media all and (min-width: 640px) and (max-width: 960px) {
-//  .main-container-component .inputs .text-input {
-//    width: 630px;
-//  }
-//}
+/* scrollbar breaks it a bit for 961px - 974px */
+/* todo use grid */
+@media all and (min-width: 640px) and (max-width: 960px) {
+  .main-container-component .inputs .text-input-wrapper {
+    width: 632px;
+  }
+}
 
 @media all and (min-width: 960px) {
   .main-container-component .inputs > * {
