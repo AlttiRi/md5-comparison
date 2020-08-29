@@ -9,7 +9,6 @@ div.main-container-component
       FileInputDragNDrop(
           :class="{'selected-input': activeInputType === 'file'}"
           ref="fileInputComponent"
-          @file-input-change="onFileInputChange"
           :file="inputFile")
 
       div.settings(:class="{inactive: activeInputType !== 'file'}")
@@ -95,10 +94,6 @@ div.main-container-component
   div.interface
     button(@click="computeAll")
       | Compute all
-    //button(@click="clearInputData")
-    //  | Clear input data
-    //button(@click="clearInputText")
-    //  | Clear input text
 </template>
 
 <script>
@@ -108,6 +103,7 @@ import FormattedNumber from "./FormattedNumber.vue";
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
 import MD5 from "../md5-provider.js";
+import {mapActions, mapMutations, mapState} from "vuex";
 
 export default {
   name: "MainContainer",
@@ -118,9 +114,7 @@ export default {
   },
   data() {
     return {
-      inputText: "",
-      inputFile: null,
-      inputBinary: null,
+      hashers: MD5.list,
       storeInMemory: false,
       binaryLoading: false,
       loadingToMemoryTime: 0,
@@ -133,6 +127,19 @@ export default {
     }
   },
   computed: {
+    ...mapState("input", {
+      _inputText: state => state.text,
+      inputFile: state => state.file,
+      inputBinary: state => state.binary
+    }),
+    inputText: {
+      get() {
+        return this._inputText;
+      },
+      set(value) {
+        this.setText(value);
+      }
+    },
     inputByteSize() {
       if (this.activeInputType === "text") {
         return new TextEncoder().encode(this.inputText).byteLength;
@@ -141,9 +148,6 @@ export default {
         return this.inputFile.size/* || this.inputBinary.byteLength*/;
       }
       return 0;
-    },
-    hashers() {
-      return MD5.list;
     },
     input() {
       if (this.activeInputType === "file") {
@@ -178,6 +182,8 @@ export default {
     },
   },
   methods: {
+    ...mapActions("input", ["initBinary"]),
+    ...mapMutations("input", ["setText", "clearBinary"]),
     async computeAll() {
       bus.$emit("input-changed"); // todo rename
       for (const item of this.$refs.items) {
@@ -185,29 +191,17 @@ export default {
         await new Promise(resolve => Util.setImmediate(resolve));
       }
     },
-    clearInputData() {
-      this.inputFile = null;
-      this.inputBinary = null;
-    },
-    clearInputText() {
-      this.inputText = "";
-    },
-    async onFileInputChange(file) {
-      this.inputFile = file;
-    },
     async updateInputBinary() {
       // load file to the memory
       if (this.storeInMemory && this.inputFile) {
         this.loadingToMemoryTime = null;
         this.binaryLoading = true;
         const now = performance.now();
-        this.inputBinary = await this.inputFile.arrayBuffer();                                 // [1]
-        /* just to compare arrayBuffer() with FileReader */
-        // this.inputBinary = await (Util.iterateBlob1(this.inputFile, 1024**4).next()).value; // [2]
+        await this.initBinary(); //await this.setBinary(this.inputFile);
         this.loadingToMemoryTime = performance.now() - now;
         this.binaryLoading = false;
       } else {
-        this.inputBinary = null;
+        this.clearBinary(); //todo do on uncheck
       }
     }
   }

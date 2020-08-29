@@ -32,7 +32,8 @@ export const inputOptions = {
 export const outputOptions = {
     format: "iife",
     globals: {
-        "vue": "Vue"
+        "vue": "Vue",
+        "vuex": "Vuex"
     },
     sourcemap: true,
 };

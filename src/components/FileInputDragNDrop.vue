@@ -21,23 +21,28 @@ div.file-input-drag-n-drop-component(
 </template>
 
 <script>
-import FormattedNumber from "./FormattedNumber.vue";
 import * as Util from "../util.js";
-
+import {mapMutations, mapState} from "vuex";
 
 export default {
-  props: ["file"],
   data() {
     return {
       dropHover: false
     }
   },
+  computed: {
+    ...mapState("input", {
+      file: state => state.file
+    })
+  },
   methods: {
+    ...mapMutations("input", ["setFile", "clearFile"]),
+
     secondsToFormattedString: Util.secondsToFormattedString,
     bytesToSize: Util.bytesToSize,
 
     async handleFileData(file) {
-      this.$emit("file-input-change", file);
+      this.setFile(file);
     },
 
     async onFileInputChange(event) {
@@ -65,7 +70,7 @@ export default {
 
     disableDragOverNonThisComponent() {
       document.querySelector("body").addEventListener("dragover", event => {
-        if (!this.$el.contains(event.target)) {
+        if (!this.$el.contains(/** @type {DragEvent}*/ event.target)) {
           event.preventDefault();
           event.dataTransfer.dropEffect = "none";
         }
@@ -74,12 +79,10 @@ export default {
   },
   mounted() {
     this.disableDragOverNonThisComponent();
-  },
-  components: {
-    "formatted-number": FormattedNumber
   }
 }
 </script>
+
 <style lang="scss" scoped>
 .file-input-drag-n-drop-component {
   min-height: 6em;
