@@ -6,8 +6,7 @@ div.main-container-component
     div.file-group
       FileInputDragNDrop(
           :class="{'selected-input': activeInputType === 'file'}"
-          ref="fileInputComponent"
-          :file="inputFile")
+          ref="fileInputComponent")
 
       div.settings(:class="{inactive: activeInputType !== 'file'}")
         div.store-in-memory
