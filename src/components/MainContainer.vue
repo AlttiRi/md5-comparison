@@ -2,9 +2,7 @@
 div.main-container-component
   div.inputs
     div.text-input
-      div.textarea-wrapper(:class="{'selected-input': activeInputType === 'text'}")
-        label
-          textarea(placeholder="Type a text here" v-model="inputText")
+      TextInput(:class="{'selected-input': activeInputType === 'text'}")
     div.file-group
       FileInputDragNDrop(
           :class="{'selected-input': activeInputType === 'file'}"
@@ -99,6 +97,7 @@ div.main-container-component
 <script>
 import HasherItem from "./HasherItem.vue";
 import FileInputDragNDrop from "./FileInputDragNDrop.vue";
+import TextInput from "./TextInput.vue";
 import FormattedNumber from "./FormattedNumber.vue";
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
@@ -107,11 +106,6 @@ import {mapActions, mapMutations, mapState} from "vuex";
 
 export default {
   name: "MainContainer",
-  components: {
-    HasherItem,
-    FileInputDragNDrop,
-    FormattedNumber
-  },
   data() {
     return {
       hashers: MD5.list,
@@ -128,18 +122,10 @@ export default {
   },
   computed: {
     ...mapState("input", {
-      _inputText: state => state.text,
+      inputText: state => state.text,
       inputFile: state => state.file,
       inputBinary: state => state.binary
     }),
-    inputText: {
-      get() {
-        return this._inputText;
-      },
-      set(value) {
-        this.setText(value);
-      }
-    },
     inputByteSize() {
       if (this.activeInputType === "text") {
         return new TextEncoder().encode(this.inputText).byteLength;
@@ -183,7 +169,7 @@ export default {
   },
   methods: {
     ...mapActions("input", ["initBinary"]),
-    ...mapMutations("input", ["setText", "clearBinary"]),
+    ...mapMutations("input", ["clearBinary"]),
     async computeAll() {
       bus.$emit("input-changed"); // todo rename
       for (const item of this.$refs.items) {
@@ -204,6 +190,12 @@ export default {
         this.clearBinary(); //todo do on uncheck
       }
     }
+  },
+  components: {
+    TextInput,
+    FileInputDragNDrop,
+    FormattedNumber,
+    HasherItem,
   }
 };
 </script>
@@ -239,26 +231,6 @@ export default {
     .text-input {
       display: flex;
       align-self: stretch;
-      box-sizing: border-box;
-      .textarea-wrapper {
-        border: solid 1px var(--textarea-wrapper-border);
-        box-sizing: border-box;
-        textarea {
-          width: 310px;
-          box-sizing: border-box;
-          display: block;
-          height: 100%;
-          border: 0;
-          outline: none;
-          min-height: 100px;
-          padding: 5px;
-          font-size: 17px;
-          &:focus::placeholder {
-            opacity: 0;
-            transition: opacity 0.25s ease;
-          }
-        }
-      }
     }
 
     .file-group {
@@ -340,13 +312,13 @@ export default {
   }
 }
 
-/* scrollbar breaks it a bit for 961px - 974px */
-/* todo use grid */
-@media all and (min-width: 640px) and (max-width: 960px) {
-  .main-container-component .inputs .text-input .textarea-wrapper textarea {
-    width: 630px;
-  }
-}
+///* scrollbar breaks it a bit for 961px - 974px */
+///* todo use grid */
+//@media all and (min-width: 640px) and (max-width: 960px) {
+//  .main-container-component .inputs .text-input {
+//    width: 630px;
+//  }
+//}
 
 @media all and (min-width: 960px) {
   .main-container-component .inputs > * {
