@@ -1973,51 +1973,44 @@
         }
       },
       [
-        _c(
-          "label",
-          {
-            staticStyle: { width: "100%", height: "100%" },
-            attrs: { for: "file-input" }
-          },
-          [
-            !_vm.file
+        _c("label", { attrs: { for: "file-input" } }, [
+          !_vm.file
+            ? _c(
+                "div",
+                { attrs: { id: "add-files-button" } },
+                [_vm._t("default", [_vm._v("Select file")])],
+                2
+              )
+            : _vm._e(),
+          _c("input", {
+            staticStyle: { display: "none" },
+            attrs: { id: "file-input", type: "file", accept: "*/*" },
+            on: { change: _vm.onFileInputChange }
+          }),
+          _c("div", { staticClass: "file-info" }, [
+            _vm.file
               ? _c(
                   "div",
-                  { attrs: { id: "add-files-button" } },
-                  [_vm._t("default", [_vm._v("Select file")])],
-                  2
+                  { staticClass: "file-name", attrs: { title: _vm.file.name } },
+                  [_vm._v(_vm._s(_vm.file.name))]
                 )
               : _vm._e(),
-            _c("input", {
-              staticStyle: { display: "none" },
-              attrs: { id: "file-input", type: "file", accept: "*/*" },
-              on: { change: _vm.onFileInputChange }
-            }),
-            _c("div", { staticClass: "file-info" }, [
-              _vm.file
-                ? _c(
-                    "div",
-                    { staticClass: "file-name", attrs: { title: _vm.file.name } },
-                    [_vm._v(_vm._s(_vm.file.name))]
-                  )
-                : _vm._e(),
-              _vm.file
-                ? _c("div", { staticClass: "file-size" }, [
-                    _vm._v(_vm._s(_vm.bytesToSize(_vm.file.size)))
-                  ])
-                : _vm._e(),
-              _vm.file
-                ? _c("div", { staticClass: "file-mtime" }, [
-                    _vm._v(
-                      _vm._s(
-                        _vm.secondsToFormattedString(_vm.file.lastModified / 1000)
-                      )
+            _vm.file
+              ? _c("div", { staticClass: "file-size" }, [
+                  _vm._v(_vm._s(_vm.bytesToSize(_vm.file.size)))
+                ])
+              : _vm._e(),
+            _vm.file
+              ? _c("div", { staticClass: "file-mtime" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.secondsToFormattedString(_vm.file.lastModified / 1000)
                     )
-                  ])
-                : _vm._e()
-            ])
-          ]
-        )
+                  )
+                ])
+              : _vm._e()
+          ])
+        ])
       ]
     )
   };
@@ -2027,7 +2020,7 @@
     /* style */
     const __vue_inject_styles__$3 = undefined;
     /* scoped */
-    const __vue_scope_id__$3 = "data-v-3dacb1e3";
+    const __vue_scope_id__$3 = "data-v-8f729f64";
     /* module identifier */
     const __vue_module_identifier__$3 = undefined;
     /* functional template */
@@ -2047,6 +2040,92 @@
       __vue_scope_id__$3,
       __vue_is_functional_template__$3,
       __vue_module_identifier__$3,
+      false,
+      undefined,
+      undefined,
+      undefined
+    );
+
+  //
+
+  var script$4 = {
+    name: "TextInput",
+    computed: {
+      ...mapState("input", {
+        _text: state => state.text,
+      }),
+      text: {
+        get() {
+          return this._text;
+        },
+        set(value) {
+          this.setText(value);
+        }
+      }
+    },
+    methods: {
+      ...mapMutations("input", ["setText"])
+    }
+  };
+
+  /* script */
+  const __vue_script__$4 = script$4;
+  /* template */
+  var __vue_render__$4 = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", { staticClass: "text-input-component" }, [
+      _c("label", [
+        _c("textarea", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.text,
+              expression: "text"
+            }
+          ],
+          attrs: { placeholder: "Type a text here" },
+          domProps: { value: _vm.text },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.text = $event.target.value;
+            }
+          }
+        })
+      ])
+    ])
+  };
+  var __vue_staticRenderFns__$4 = [];
+  __vue_render__$4._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$4 = undefined;
+    /* scoped */
+    const __vue_scope_id__$4 = "data-v-553cd546";
+    /* module identifier */
+    const __vue_module_identifier__$4 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$4 = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$4 = /*#__PURE__*/normalizeComponent(
+      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+      __vue_inject_styles__$4,
+      __vue_script__$4,
+      __vue_scope_id__$4,
+      __vue_is_functional_template__$4,
+      __vue_module_identifier__$4,
       false,
       undefined,
       undefined,
@@ -2236,13 +2315,8 @@
 
   //
 
-  var script$4 = {
+  var script$5 = {
     name: "MainContainer",
-    components: {
-      HasherItem: __vue_component__$2,
-      FileInputDragNDrop: __vue_component__$3,
-      FormattedNumber: __vue_component__$1
-    },
     data() {
       return {
         hashers: MD5.list,
@@ -2259,18 +2333,10 @@
     },
     computed: {
       ...mapState("input", {
-        _inputText: state => state.text,
+        inputText: state => state.text,
         inputFile: state => state.file,
         inputBinary: state => state.binary
       }),
-      inputText: {
-        get() {
-          return this._inputText;
-        },
-        set(value) {
-          this.setText(value);
-        }
-      },
       inputByteSize() {
         if (this.activeInputType === "text") {
           return new TextEncoder().encode(this.inputText).byteLength;
@@ -2314,7 +2380,7 @@
     },
     methods: {
       ...mapActions("input", ["initBinary"]),
-      ...mapMutations("input", ["setText", "clearBinary"]),
+      ...mapMutations("input", ["clearBinary"]),
       async computeAll() {
         bus.$emit("input-changed"); // todo rename
         for (const item of this.$refs.items) {
@@ -2335,59 +2401,41 @@
           this.clearBinary(); //todo do on uncheck
         }
       }
+    },
+    components: {
+      TextInput: __vue_component__$4,
+      FileInputDragNDrop: __vue_component__$3,
+      FormattedNumber: __vue_component__$1,
+      HasherItem: __vue_component__$2,
     }
   };
 
   /* script */
-  const __vue_script__$4 = script$4;
+  const __vue_script__$5 = script$5;
   /* template */
-  var __vue_render__$4 = function() {
+  var __vue_render__$5 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
     return _c("div", { staticClass: "main-container-component" }, [
       _c("div", { staticClass: "inputs" }, [
-        _c("div", { staticClass: "text-input" }, [
-          _c(
-            "div",
-            {
-              staticClass: "textarea-wrapper",
+        _c(
+          "div",
+          { staticClass: "text-input-wrapper" },
+          [
+            _c("TextInput", {
               class: { "selected-input": _vm.activeInputType === "text" }
-            },
-            [
-              _c("label", [
-                _c("textarea", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.inputText,
-                      expression: "inputText"
-                    }
-                  ],
-                  attrs: { placeholder: "Type a text here" },
-                  domProps: { value: _vm.inputText },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.inputText = $event.target.value;
-                    }
-                  }
-                })
-              ])
-            ]
-          )
-        ]),
+            })
+          ],
+          1
+        ),
         _c(
           "div",
           { staticClass: "file-group" },
           [
             _c("FileInputDragNDrop", {
               ref: "fileInputComponent",
-              class: { "selected-input": _vm.activeInputType === "file" },
-              attrs: { file: _vm.inputFile }
+              class: { "selected-input": _vm.activeInputType === "file" }
             }),
             _c(
               "div",
@@ -2779,17 +2827,17 @@
       ])
     ])
   };
-  var __vue_staticRenderFns__$4 = [];
-  __vue_render__$4._withStripped = true;
+  var __vue_staticRenderFns__$5 = [];
+  __vue_render__$5._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$4 = undefined;
+    const __vue_inject_styles__$5 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-54253f06";
+    const __vue_scope_id__$5 = "data-v-ee66d6be";
     /* module identifier */
-    const __vue_module_identifier__$4 = undefined;
+    const __vue_module_identifier__$5 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$4 = false;
+    const __vue_is_functional_template__$5 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -2798,13 +2846,13 @@
     
 
     
-    const __vue_component__$4 = /*#__PURE__*/normalizeComponent(
-      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
-      __vue_inject_styles__$4,
-      __vue_script__$4,
-      __vue_scope_id__$4,
-      __vue_is_functional_template__$4,
-      __vue_module_identifier__$4,
+    const __vue_component__$5 = /*#__PURE__*/normalizeComponent(
+      { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+      __vue_inject_styles__$5,
+      __vue_script__$5,
+      __vue_scope_id__$5,
+      __vue_is_functional_template__$5,
+      __vue_module_identifier__$5,
       false,
       undefined,
       undefined,
@@ -2813,7 +2861,7 @@
 
   new Vue__default['default']({
       store,
-      render: createElement => createElement(__vue_component__$4),
+      render: createElement => createElement(__vue_component__$5),
   }).$mount("#app");
 
 }(Vue));
