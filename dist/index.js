@@ -1079,25 +1079,58 @@
       text: "",
       /** @type {File} */
       file: null,
+
       /** @type {ArrayBuffer} */
       binary: null,
+      /** @type {Boolean} */
+      binaryLoading: false,
+      /** @type {Number} */
+      loadingToMemoryTime: null,
+
+      /** @type {DOMException} */
+      error: null, // Loading file to memory error
   });
 
-  const getters = {};
+  const getters = {
+      textByteSize(state, getters) {
+          return new TextEncoder().encode(state.text).byteLength;
+      },
+      fileByteSize(state, getters) {
+          return state.file.size; // `state.binary.byteLength` for binary
+      },
+  };
 
   const actions = {
-      /**
-       * @param state
-       * @param {File} file
-       */
-      async setBinary({commit}, file) {
-          const binary = await file.arrayBuffer();                                            // [1]
-          /* just to compare arrayBuffer() with FileReader */
-          // const binary == await (Util.iterateBlob1(this.inputFile, 1024**4).next()).value; // [2]
+      async setBinary({commit, state}, /** @type {File}*/ file) {
+          commit("binaryLoading", true);
+          commit("loadingToMemoryTime", null);
+
+          if (state.error) {
+              commit("resetError");
+          }
+
+          const now = performance.now();
+
+          let binary;
+          try {
+              binary = await file.arrayBuffer();                                 // [1]
+              /* just to compare arrayBuffer() with FileReader */
+              // binary = await (Util.iterateBlob1(file, 1024**4).next()).value; // [2]
+          } catch (error) {
+              // When there is not enough memory space:
+              // DOMException:
+              // The requested file could not be read, typically due to permission problems
+              // that have occurred after a reference to a file was acquired.
+              console.error(error);
+              commit("error", error);  // error.name === NotReadableError
+          }
           commit("setBinary", binary);
+
+          commit("binaryLoading", false);
+          commit("loadingToMemoryTime", performance.now() - now);
       },
       async initBinary({dispatch, state}) {
-          dispatch("setBinary", state.file);
+          await dispatch("setBinary", state.file);
       }
   };
 
@@ -1121,6 +1154,20 @@
       },
       clearBinary(state) {
           state.binary = null;
+      },
+
+      binaryLoading(state, binaryLoading) {
+          state.binaryLoading = binaryLoading;
+      },
+      loadingToMemoryTime(state, loadingToMemoryTime) {
+          state.loadingToMemoryTime = loadingToMemoryTime;
+      },
+
+      error(state, error) {
+          state.error = error;
+      },
+      resetError(state) {
+          state.error = null;
       }
   };
 
@@ -1133,11 +1180,33 @@
       mutations
   };
 
+  const state$1 = () => ({
+      activeInputType: "text",
+      activeInputTypeAutoSwitcher: true
+  });
+
+  const mutations$1 = {
+      activeInputType(state, activeInputType) {
+          state.activeInputType = activeInputType;
+      },
+      activeInputTypeAutoSwitcher(state, activeInputTypeAutoSwitcher) {
+          state.activeInputTypeAutoSwitcher = activeInputTypeAutoSwitcher;
+      }
+  };
+
+  var inputSwitch = {
+      namespaced: true,
+      state: state$1,
+      mutations: mutations$1
+  };
+
   Vue__default['default'].use(index);
 
   var store = new index.Store({
       modules: {
-          input
+          input,
+          // ["file-settings"]: fileSettings,
+          ["input-switch"]: inputSwitch
       },
       plugins: [logger]
   });
@@ -2132,6 +2201,235 @@
       undefined
     );
 
+  //
+
+  var script$5 = {
+    name: "InputSwitch",
+    props: ["storeInMemory"],
+    computed: {
+      ...mapState("input", {
+        inputText: state => state.text,
+        inputFile: state => state.file,
+      }),
+      ...mapGetters("input", ["textByteSize", "fileByteSize"]),
+
+      activeInputType: {
+        get() { return this.$store.state["input-switch"].activeInputType; },
+        set(value) { this.$store.commit("input-switch/activeInputType", value); }
+      },
+      activeInputTypeAutoSwitcher: {
+        get() { return this.$store.state["input-switch"].activeInputTypeAutoSwitcher; },
+        set(value) { this.$store.commit("input-switch/activeInputTypeAutoSwitcher", value); }
+      },
+
+      inputByteSize() {
+        if (this.activeInputType === "text") {
+          return this.textByteSize;
+        }
+        if (this.activeInputType === "file" && this.inputFile) {
+          return this.fileByteSize;
+        }
+        return 0;
+      }
+    },
+    methods: {
+      ...mapActions("input", ["initBinary"]),
+      ...mapMutations("input", ["clearBinary", "resetError"]),
+    },
+    watch: {
+      activeInputType() {
+        bus.$emit("input-changed");
+      },
+      async storeInMemory() {
+        if (this.storeInMemory) {
+          if (this.inputFile) {
+            await this.initBinary();
+          }
+        } else {
+          this.clearBinary();
+        }
+      },
+      async inputFile() {
+        this.resetError();
+
+        if (this.activeInputTypeAutoSwitcher) {
+          this.activeInputType = "file";
+        }
+        if (this.activeInputType === "file") {
+          bus.$emit("input-changed");
+        }
+
+        if (this.storeInMemory) {
+          if (this.inputFile) {
+            await this.initBinary();
+          } else {
+            this.clearBinary();
+          }
+        }
+      },
+      inputText() {
+        if (this.activeInputTypeAutoSwitcher) {
+          this.activeInputType = "text";
+        }
+        if (this.activeInputType === "text") {
+          bus.$emit("input-changed");
+        }
+      },
+    },
+    components: {
+      FormattedNumber: __vue_component__$1
+    }
+  };
+
+  /* script */
+  const __vue_script__$5 = script$5;
+  /* template */
+  var __vue_render__$5 = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", { staticClass: "input-switch" }, [
+      _c("div", { staticClass: "switch-line" }, [
+        _vm._v("Input:"),
+        _c("label", [
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.activeInputType,
+                expression: "activeInputType"
+              }
+            ],
+            attrs: { type: "radio", name: "input", value: "text" },
+            domProps: { checked: _vm._q(_vm.activeInputType, "text") },
+            on: {
+              change: function($event) {
+                _vm.activeInputType = "text";
+              }
+            }
+          }),
+          _vm._v("Text")
+        ]),
+        _c("label", [
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.activeInputType,
+                expression: "activeInputType"
+              }
+            ],
+            attrs: { type: "radio", name: "input", value: "file" },
+            domProps: { checked: _vm._q(_vm.activeInputType, "file") },
+            on: {
+              change: function($event) {
+                _vm.activeInputType = "file";
+              }
+            }
+          }),
+          _vm._v("File")
+        ]),
+        _c(
+          "label",
+          {
+            staticClass: "input-switch-checkbox",
+            attrs: {
+              title:
+                "Switch the input type automatically based on the corresponding input change"
+            }
+          },
+          [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.activeInputTypeAutoSwitcher,
+                  expression: "activeInputTypeAutoSwitcher"
+                }
+              ],
+              attrs: { type: "checkbox" },
+              domProps: {
+                checked: Array.isArray(_vm.activeInputTypeAutoSwitcher)
+                  ? _vm._i(_vm.activeInputTypeAutoSwitcher, null) > -1
+                  : _vm.activeInputTypeAutoSwitcher
+              },
+              on: {
+                change: function($event) {
+                  var $$a = _vm.activeInputTypeAutoSwitcher,
+                    $$el = $event.target,
+                    $$c = $$el.checked ? true : false;
+                  if (Array.isArray($$a)) {
+                    var $$v = null,
+                      $$i = _vm._i($$a, $$v);
+                    if ($$el.checked) {
+                      $$i < 0 &&
+                        (_vm.activeInputTypeAutoSwitcher = $$a.concat([$$v]));
+                    } else {
+                      $$i > -1 &&
+                        (_vm.activeInputTypeAutoSwitcher = $$a
+                          .slice(0, $$i)
+                          .concat($$a.slice($$i + 1)));
+                    }
+                  } else {
+                    _vm.activeInputTypeAutoSwitcher = $$c;
+                  }
+                }
+              }
+            }),
+            _vm._v("Auto-Switch")
+          ]
+        )
+      ]),
+      _c("div", { staticClass: "input-info" }, [
+        _vm._v("Input size:\n"),
+        _vm.activeInputType === "file" && _vm.inputFile === null
+          ? _c("span", { staticClass: "red" }, [_vm._v("no file selected")])
+          : _c(
+              "span",
+              [
+                _c("FormattedNumber", { attrs: { number: _vm.inputByteSize } }),
+                _vm._v("\nbytes")
+              ],
+              1
+            )
+      ])
+    ])
+  };
+  var __vue_staticRenderFns__$5 = [];
+  __vue_render__$5._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$5 = undefined;
+    /* scoped */
+    const __vue_scope_id__$5 = "data-v-2ef0864e";
+    /* module identifier */
+    const __vue_module_identifier__$5 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$5 = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$5 = /*#__PURE__*/normalizeComponent(
+      { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+      __vue_inject_styles__$5,
+      __vue_script__$5,
+      __vue_scope_id__$5,
+      __vue_is_functional_template__$5,
+      __vue_module_identifier__$5,
+      false,
+      undefined,
+      undefined,
+      undefined
+    );
+
   /**
    * A normalised hasher
    * @abstract
@@ -2315,37 +2613,35 @@
 
   //
 
-  var script$5 = {
+  var script$6 = {
     name: "MainContainer",
     data() {
       return {
         hashers: MD5.list,
         storeInMemory: false,
-        binaryLoading: false,
-        loadingToMemoryTime: 0,
         streamType: "FileReader",
         animation: true,
         fps: 25,
         readerChunkSizeMB: 2,
-        activeInputType: "text",
-        activeInputTypeAutoSwitcher: true,
       }
     },
     computed: {
       ...mapState("input", {
         inputText: state => state.text,
         inputFile: state => state.file,
-        inputBinary: state => state.binary
+        inputBinary: state => state.binary,
+
+        binaryLoading: state => state.binaryLoading,
+        loadingToMemoryTime: state => state.loadingToMemoryTime,
+
+        error: state => state.error,
       }),
-      inputByteSize() {
-        if (this.activeInputType === "text") {
-          return new TextEncoder().encode(this.inputText).byteLength;
-        }
-        if (this.activeInputType === "file" && this.inputFile) {
-          return this.inputFile.size/* || this.inputBinary.byteLength*/;
-        }
-        return 0;
-      },
+
+      ...mapState("input-switch", {
+        activeInputType: state => state.activeInputType,
+        activeInputTypeAutoSwitcher: state => state.activeInputTypeAutoSwitcher,
+      }),
+
       input() {
         if (this.activeInputType === "file") {
           return this.inputBinary || this.inputFile;
@@ -2357,30 +2653,7 @@
         return Math.trunc(Number(this.readerChunkSizeMB) * 1024 * 1024);
       },
     },
-    watch: {
-      inputFile() {
-        if (this.activeInputTypeAutoSwitcher) {
-          this.activeInputType = "file";
-        }
-        bus.$emit("input-changed");
-        this.updateInputBinary();
-      },
-      inputText() {
-        if (this.activeInputTypeAutoSwitcher) {
-          this.activeInputType = "text";
-        }
-        bus.$emit("input-changed");
-      },
-      activeInputType() {
-        bus.$emit("input-changed");
-      },
-      storeInMemory() {
-        this.updateInputBinary();
-      },
-    },
     methods: {
-      ...mapActions("input", ["initBinary"]),
-      ...mapMutations("input", ["clearBinary"]),
       async computeAll() {
         bus.$emit("input-changed"); // todo rename
         for (const item of this.$refs.items) {
@@ -2388,456 +2661,360 @@
           await new Promise(resolve => setImmediate(resolve));
         }
       },
-      async updateInputBinary() {
-        // load file to the memory
-        if (this.storeInMemory && this.inputFile) {
-          this.loadingToMemoryTime = null;
-          this.binaryLoading = true;
-          const now = performance.now();
-          await this.initBinary(); //await this.setBinary(this.inputFile);
-          this.loadingToMemoryTime = performance.now() - now;
-          this.binaryLoading = false;
-        } else {
-          this.clearBinary(); //todo do on uncheck
-        }
-      }
+    },
+    watch: {
+      error() {
+        this.storeInMemory = false;
+      },
     },
     components: {
       TextInput: __vue_component__$4,
       FileInputDragNDrop: __vue_component__$3,
       FormattedNumber: __vue_component__$1,
       HasherItem: __vue_component__$2,
+      InputSwitch: __vue_component__$5
     }
   };
 
   /* script */
-  const __vue_script__$5 = script$5;
+  const __vue_script__$6 = script$6;
   /* template */
-  var __vue_render__$5 = function() {
+  var __vue_render__$6 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "main-container-component" }, [
-      _c("div", { staticClass: "inputs" }, [
-        _c(
-          "div",
-          { staticClass: "text-input-wrapper" },
-          [
-            _c("TextInput", {
-              class: { "selected-input": _vm.activeInputType === "text" }
-            })
-          ],
-          1
-        ),
-        _c(
-          "div",
-          { staticClass: "file-group" },
-          [
-            _c("FileInputDragNDrop", {
-              ref: "fileInputComponent",
-              class: { "selected-input": _vm.activeInputType === "file" }
-            }),
-            _c(
-              "div",
-              {
-                staticClass: "settings",
-                class: { inactive: _vm.activeInputType !== "file" }
-              },
-              [
-                _c("div", { staticClass: "store-in-memory" }, [
-                  _c("label", [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.storeInMemory,
-                          expression: "storeInMemory"
-                        }
-                      ],
-                      attrs: { type: "checkbox" },
-                      domProps: {
-                        checked: Array.isArray(_vm.storeInMemory)
-                          ? _vm._i(_vm.storeInMemory, null) > -1
-                          : _vm.storeInMemory
-                      },
-                      on: {
-                        change: function($event) {
-                          var $$a = _vm.storeInMemory,
-                            $$el = $event.target,
-                            $$c = $$el.checked ? true : false;
-                          if (Array.isArray($$a)) {
-                            var $$v = null,
-                              $$i = _vm._i($$a, $$v);
-                            if ($$el.checked) {
-                              $$i < 0 && (_vm.storeInMemory = $$a.concat([$$v]));
-                            } else {
-                              $$i > -1 &&
-                                (_vm.storeInMemory = $$a
-                                  .slice(0, $$i)
-                                  .concat($$a.slice($$i + 1)));
-                            }
-                          } else {
-                            _vm.storeInMemory = $$c;
-                          }
-                        }
-                      }
-                    }),
-                    _vm._v(
-                      "Store in memory " +
-                        _vm._s(_vm.binaryLoading ? " (loadings...)" : "")
-                    ),
-                    _vm.loadingToMemoryTime &&
-                    _vm.storeInMemory &&
-                    _vm.inputBinary !== null
-                      ? _c(
-                          "span",
-                          { attrs: { title: "loaded in" } },
-                          [
-                            _vm._v("("),
-                            _c("FormattedNumber", {
-                              attrs: { number: _vm.loadingToMemoryTime }
-                            }),
-                            _vm._v("\nms)")
-                          ],
-                          1
-                        )
-                      : _vm._e()
-                  ])
-                ]),
-                _c("div", { staticClass: "stream-type" }, [
-                  _c("div", { style: { opacity: _vm.storeInMemory ? 0.5 : 1 } }, [
+    return _c(
+      "div",
+      { staticClass: "main-container-component" },
+      [
+        _c("div", { staticClass: "inputs" }, [
+          _c(
+            "div",
+            { staticClass: "text-input-wrapper" },
+            [
+              _c("TextInput", {
+                class: { "selected-input": _vm.activeInputType === "text" }
+              })
+            ],
+            1
+          ),
+          _c(
+            "div",
+            { staticClass: "file-group" },
+            [
+              _c("FileInputDragNDrop", {
+                ref: "fileInputComponent",
+                class: { "selected-input": _vm.activeInputType === "file" }
+              }),
+              _c(
+                "div",
+                {
+                  staticClass: "settings",
+                  class: { inactive: _vm.activeInputType !== "file" }
+                },
+                [
+                  _c("div", { staticClass: "store-in-memory" }, [
                     _c("label", [
                       _c("input", {
                         directives: [
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: _vm.streamType,
-                            expression: "streamType"
-                          }
-                        ],
-                        attrs: {
-                          type: "radio",
-                          name: "streamType",
-                          value: "FileReader"
-                        },
-                        domProps: {
-                          checked: _vm._q(_vm.streamType, "FileReader")
-                        },
-                        on: {
-                          change: function($event) {
-                            _vm.streamType = "FileReader";
-                          }
-                        }
-                      }),
-                      _vm._v("FileReader")
-                    ]),
-                    _c("label", [
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.streamType,
-                            expression: "streamType"
-                          }
-                        ],
-                        attrs: {
-                          type: "radio",
-                          name: "streamType",
-                          value: "ReadableStream"
-                        },
-                        domProps: {
-                          checked: _vm._q(_vm.streamType, "ReadableStream")
-                        },
-                        on: {
-                          change: function($event) {
-                            _vm.streamType = "ReadableStream";
-                          }
-                        }
-                      }),
-                      _vm._v("ReadableStream")
-                    ])
-                  ]),
-                  _c(
-                    "label",
-                    {
-                      style: {
-                        opacity:
-                          _vm.streamType === "ReadableStream" &&
-                          !_vm.storeInMemory
-                            ? 0.5
-                            : 1
-                      },
-                      attrs: {
-                        title: "Chunk size for progressive hashing, Megabytes"
-                      }
-                    },
-                    [
-                      _vm._v("Chunk size, MB"),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.readerChunkSizeMB,
-                            expression: "readerChunkSizeMB"
-                          }
-                        ],
-                        class: { invalid: _vm.readerChunkSize < 1 },
-                        attrs: {
-                          type: "number",
-                          min: "0.1",
-                          step: "0.1",
-                          title:
-                            _vm.readerChunkSize > 0
-                              ? ""
-                              : "Value must be greater than or equal to 1 byte"
-                        },
-                        domProps: { value: _vm.readerChunkSizeMB },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.readerChunkSizeMB = $event.target.value;
-                          }
-                        }
-                      })
-                    ]
-                  )
-                ]),
-                _c("div", { staticClass: "animation" }, [
-                  _c("span", { staticClass: "checkbox" }, [
-                    _c("label", [
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.animation,
-                            expression: "animation"
+                            value: _vm.storeInMemory,
+                            expression: "storeInMemory"
                           }
                         ],
                         attrs: { type: "checkbox" },
                         domProps: {
-                          checked: Array.isArray(_vm.animation)
-                            ? _vm._i(_vm.animation, null) > -1
-                            : _vm.animation
+                          checked: Array.isArray(_vm.storeInMemory)
+                            ? _vm._i(_vm.storeInMemory, null) > -1
+                            : _vm.storeInMemory
                         },
                         on: {
                           change: function($event) {
-                            var $$a = _vm.animation,
+                            var $$a = _vm.storeInMemory,
                               $$el = $event.target,
                               $$c = $$el.checked ? true : false;
                             if (Array.isArray($$a)) {
                               var $$v = null,
                                 $$i = _vm._i($$a, $$v);
                               if ($$el.checked) {
-                                $$i < 0 && (_vm.animation = $$a.concat([$$v]));
+                                $$i < 0 && (_vm.storeInMemory = $$a.concat([$$v]));
                               } else {
                                 $$i > -1 &&
-                                  (_vm.animation = $$a
+                                  (_vm.storeInMemory = $$a
                                     .slice(0, $$i)
                                     .concat($$a.slice($$i + 1)));
                               }
                             } else {
-                              _vm.animation = $$c;
+                              _vm.storeInMemory = $$c;
                             }
                           }
                         }
                       }),
-                      _vm._v("Animation,\n")
+                      _vm._v("Store in memory\n"),
+                      _vm.error
+                        ? _c(
+                            "span",
+                            {
+                              staticClass: "red",
+                              attrs: {
+                                title: _vm.error.name + ": " + _vm.error.message
+                              }
+                            },
+                            [_vm._v("(error...)")]
+                          )
+                        : _vm.binaryLoading
+                        ? _c("span", [_vm._v("(loadings...)")])
+                        : _vm.loadingToMemoryTime &&
+                          _vm.storeInMemory &&
+                          _vm.inputBinary !== null
+                        ? _c(
+                            "span",
+                            { attrs: { title: "loaded in" } },
+                            [
+                              _vm._v("("),
+                              _c("FormattedNumber", {
+                                attrs: { number: _vm.loadingToMemoryTime }
+                              }),
+                              _vm._v("\nms)")
+                            ],
+                            1
+                          )
+                        : _vm._e()
                     ])
                   ]),
-                  _c(
-                    "span",
-                    {
-                      staticClass: "fps",
-                      style: { opacity: _vm.animation ? 1 : 0.5 }
-                    },
-                    [
-                      _c("label", [
-                        _vm._v("FPS"),
+                  _c("div", { staticClass: "stream-type" }, [
+                    _c(
+                      "div",
+                      { style: { opacity: _vm.storeInMemory ? 0.5 : 1 } },
+                      [
+                        _c("label", [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.streamType,
+                                expression: "streamType"
+                              }
+                            ],
+                            attrs: {
+                              type: "radio",
+                              name: "streamType",
+                              value: "FileReader"
+                            },
+                            domProps: {
+                              checked: _vm._q(_vm.streamType, "FileReader")
+                            },
+                            on: {
+                              change: function($event) {
+                                _vm.streamType = "FileReader";
+                              }
+                            }
+                          }),
+                          _vm._v("FileReader")
+                        ]),
+                        _c("label", [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.streamType,
+                                expression: "streamType"
+                              }
+                            ],
+                            attrs: {
+                              type: "radio",
+                              name: "streamType",
+                              value: "ReadableStream"
+                            },
+                            domProps: {
+                              checked: _vm._q(_vm.streamType, "ReadableStream")
+                            },
+                            on: {
+                              change: function($event) {
+                                _vm.streamType = "ReadableStream";
+                              }
+                            }
+                          }),
+                          _vm._v("ReadableStream")
+                        ])
+                      ]
+                    ),
+                    _c(
+                      "label",
+                      {
+                        style: {
+                          opacity:
+                            _vm.streamType === "ReadableStream" &&
+                            !_vm.storeInMemory
+                              ? 0.5
+                              : 1
+                        },
+                        attrs: {
+                          title: "Chunk size for progressive hashing, Megabytes"
+                        }
+                      },
+                      [
+                        _vm._v("Chunk size, MB"),
                         _c("input", {
                           directives: [
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.fps,
-                              expression: "fps"
+                              value: _vm.readerChunkSizeMB,
+                              expression: "readerChunkSizeMB"
                             }
                           ],
-                          attrs: { type: "number" },
-                          domProps: { value: _vm.fps },
+                          class: { invalid: _vm.readerChunkSize < 1 },
+                          attrs: {
+                            type: "number",
+                            min: "0.1",
+                            step: "0.1",
+                            title:
+                              _vm.readerChunkSize > 0
+                                ? ""
+                                : "Value must be greater than or equal to 1 byte"
+                          },
+                          domProps: { value: _vm.readerChunkSizeMB },
                           on: {
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
                               }
-                              _vm.fps = $event.target.value;
+                              _vm.readerChunkSizeMB = $event.target.value;
                             }
                           }
                         })
+                      ]
+                    )
+                  ]),
+                  _c("div", { staticClass: "animation" }, [
+                    _c("span", { staticClass: "checkbox" }, [
+                      _c("label", [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.animation,
+                              expression: "animation"
+                            }
+                          ],
+                          attrs: { type: "checkbox" },
+                          domProps: {
+                            checked: Array.isArray(_vm.animation)
+                              ? _vm._i(_vm.animation, null) > -1
+                              : _vm.animation
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.animation,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false;
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v);
+                                if ($$el.checked) {
+                                  $$i < 0 && (_vm.animation = $$a.concat([$$v]));
+                                } else {
+                                  $$i > -1 &&
+                                    (_vm.animation = $$a
+                                      .slice(0, $$i)
+                                      .concat($$a.slice($$i + 1)));
+                                }
+                              } else {
+                                _vm.animation = $$c;
+                              }
+                            }
+                          }
+                        }),
+                        _vm._v("Animation,\n")
                       ])
-                    ]
-                  )
-                ])
-              ]
-            )
-          ],
-          1
-        )
-      ]),
-      _c("div", { staticClass: "input-switch" }, [
-        _c("div", { staticClass: "switch-line" }, [
-          _vm._v("Input:"),
-          _c("label", [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.activeInputType,
-                  expression: "activeInputType"
-                }
-              ],
-              attrs: { type: "radio", name: "input", value: "text" },
-              domProps: { checked: _vm._q(_vm.activeInputType, "text") },
-              on: {
-                change: function($event) {
-                  _vm.activeInputType = "text";
-                }
-              }
-            }),
-            _vm._v("Text")
-          ]),
-          _c("label", [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.activeInputType,
-                  expression: "activeInputType"
-                }
-              ],
-              attrs: { type: "radio", name: "input", value: "file" },
-              domProps: { checked: _vm._q(_vm.activeInputType, "file") },
-              on: {
-                change: function($event) {
-                  _vm.activeInputType = "file";
-                }
-              }
-            }),
-            _vm._v("File")
-          ]),
-          _c(
-            "label",
-            {
-              staticClass: "input-switch-checkbox",
-              attrs: {
-                title:
-                  "Switch the input type automatically based on the corresponding input change"
-              }
-            },
-            [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.activeInputTypeAutoSwitcher,
-                    expression: "activeInputTypeAutoSwitcher"
-                  }
-                ],
-                attrs: { type: "checkbox" },
-                domProps: {
-                  checked: Array.isArray(_vm.activeInputTypeAutoSwitcher)
-                    ? _vm._i(_vm.activeInputTypeAutoSwitcher, null) > -1
-                    : _vm.activeInputTypeAutoSwitcher
-                },
-                on: {
-                  change: function($event) {
-                    var $$a = _vm.activeInputTypeAutoSwitcher,
-                      $$el = $event.target,
-                      $$c = $$el.checked ? true : false;
-                    if (Array.isArray($$a)) {
-                      var $$v = null,
-                        $$i = _vm._i($$a, $$v);
-                      if ($$el.checked) {
-                        $$i < 0 &&
-                          (_vm.activeInputTypeAutoSwitcher = $$a.concat([$$v]));
-                      } else {
-                        $$i > -1 &&
-                          (_vm.activeInputTypeAutoSwitcher = $$a
-                            .slice(0, $$i)
-                            .concat($$a.slice($$i + 1)));
-                      }
-                    } else {
-                      _vm.activeInputTypeAutoSwitcher = $$c;
-                    }
-                  }
-                }
-              }),
-              _vm._v("Auto-Switch")
-            ]
+                    ]),
+                    _c(
+                      "span",
+                      {
+                        staticClass: "fps",
+                        style: { opacity: _vm.animation ? 1 : 0.5 }
+                      },
+                      [
+                        _c("label", [
+                          _vm._v("FPS"),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.fps,
+                                expression: "fps"
+                              }
+                            ],
+                            attrs: { type: "number" },
+                            domProps: { value: _vm.fps },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.fps = $event.target.value;
+                              }
+                            }
+                          })
+                        ])
+                      ]
+                    )
+                  ])
+                ]
+              )
+            ],
+            1
           )
         ]),
-        _c("div", { staticClass: "input-info" }, [
-          _vm._v("Input size:\n"),
-          _vm.activeInputType === "file" && _vm.inputFile === null
-            ? _c("span", { staticClass: "red" }, [_vm._v("no file selected")])
-            : _c(
-                "span",
-                [
-                  _c("FormattedNumber", { attrs: { number: _vm.inputByteSize } }),
-                  _vm._v("\nbytes")
-                ],
-                1
-              )
-        ])
-      ]),
-      _c(
-        "div",
-        { staticClass: "items" },
-        _vm._l(_vm.hashers, function(hasher, index) {
-          return _c("HasherItem", {
-            key: index,
-            ref: "items",
-            refInFor: true,
-            attrs: {
-              hasher: hasher,
-              input: _vm.input,
-              settings: {
-                fps: _vm.fps,
-                animation: _vm.animation,
-                readerChunkSize: _vm.readerChunkSize,
-                streamType: _vm.streamType,
-                loadingToMemoryTime: _vm.loadingToMemoryTime
+        _c("InputSwitch", { attrs: { "store-in-memory": _vm.storeInMemory } }),
+        _c(
+          "div",
+          { staticClass: "items" },
+          _vm._l(_vm.hashers, function(hasher, index) {
+            return _c("HasherItem", {
+              key: index,
+              ref: "items",
+              refInFor: true,
+              attrs: {
+                hasher: hasher,
+                input: _vm.input,
+                settings: {
+                  fps: _vm.fps,
+                  animation: _vm.animation,
+                  readerChunkSize: _vm.readerChunkSize,
+                  streamType: _vm.streamType,
+                  loadingToMemoryTime: _vm.loadingToMemoryTime
+                }
               }
-            }
-          })
-        }),
-        1
-      ),
-      _c("div", { staticClass: "interface" }, [
-        _c("button", { on: { click: _vm.computeAll } }, [_vm._v("Compute all")])
-      ])
-    ])
+            })
+          }),
+          1
+        ),
+        _c("div", { staticClass: "interface" }, [
+          _c("button", { on: { click: _vm.computeAll } }, [_vm._v("Compute all")])
+        ])
+      ],
+      1
+    )
   };
-  var __vue_staticRenderFns__$5 = [];
-  __vue_render__$5._withStripped = true;
+  var __vue_staticRenderFns__$6 = [];
+  __vue_render__$6._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$5 = undefined;
+    const __vue_inject_styles__$6 = undefined;
     /* scoped */
-    const __vue_scope_id__$5 = "data-v-ee66d6be";
+    const __vue_scope_id__$6 = "data-v-5699fc21";
     /* module identifier */
-    const __vue_module_identifier__$5 = undefined;
+    const __vue_module_identifier__$6 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$5 = false;
+    const __vue_is_functional_template__$6 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -2846,13 +3023,13 @@
     
 
     
-    const __vue_component__$5 = /*#__PURE__*/normalizeComponent(
-      { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
-      __vue_inject_styles__$5,
-      __vue_script__$5,
-      __vue_scope_id__$5,
-      __vue_is_functional_template__$5,
-      __vue_module_identifier__$5,
+    const __vue_component__$6 = /*#__PURE__*/normalizeComponent(
+      { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+      __vue_inject_styles__$6,
+      __vue_script__$6,
+      __vue_scope_id__$6,
+      __vue_is_functional_template__$6,
+      __vue_module_identifier__$6,
       false,
       undefined,
       undefined,
@@ -2861,7 +3038,7 @@
 
   new Vue__default['default']({
       store,
-      render: createElement => createElement(__vue_component__$5),
+      render: createElement => createElement(__vue_component__$6),
   }).$mount("#app");
 
 }(Vue));
