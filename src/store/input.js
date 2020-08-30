@@ -12,7 +12,14 @@ const state = () => ({
     loadingToMemoryTime: null
 });
 
-const getters = {};
+const getters = {
+    textByteSize(state, getters) {
+        return new TextEncoder().encode(state.text).byteLength;
+    },
+    fileByteSize(state, getters) {
+        return state.file.size; // `state.binary.byteLength` for binary
+    },
+};
 
 const actions = {
     /**

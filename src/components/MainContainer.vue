@@ -101,7 +101,7 @@ import FormattedNumber from "./FormattedNumber.vue";
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
 import MD5 from "../md5-provider.js";
-import {mapActions, mapMutations, mapState} from "vuex";
+import {mapActions, mapMutations, mapState, mapGetters} from "vuex";
 
 export default {
   name: "MainContainer",
@@ -121,23 +121,24 @@ export default {
     ...mapState("input", {
       inputText: state => state.text,
       inputFile: state => state.file,
-      inputBinary: state => state.binary
+      inputBinary: state => state.binary,
+
+      binaryLoading: state => state.binaryLoading,
+      loadingToMemoryTime: state => state.loadingToMemoryTime,
     }),
-    binaryLoading: {
-    //set(value) { this.$store.commit("input/binaryLoading", value); },
-      get() { return this.$store.state["input"].binaryLoading; }
-    },
-    loadingToMemoryTime: {
-    //set(value) { this.$store.commit("input/loadingToMemoryTime", value); },
-      get() { return this.$store.state["input"].loadingToMemoryTime; }
-    },
+    ...mapGetters("input", ["textByteSize", "fileByteSize"]),
+
+    // loadingToMemoryTime: {
+    //   set(value) { this.$store.commit("input/loadingToMemoryTime", value); },
+    //   get() { return this.$store.state["input"].loadingToMemoryTime; }
+    // },
 
     inputByteSize() {
       if (this.activeInputType === "text") {
-        return new TextEncoder().encode(this.inputText).byteLength;
+        return this.textByteSize;
       }
       if (this.activeInputType === "file" && this.inputFile) {
-        return this.inputFile.size/* || this.inputBinary.byteLength*/;
+        return this.fileByteSize;
       }
       return 0;
     },
