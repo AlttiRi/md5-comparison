@@ -21,7 +21,7 @@ const actions = {
         commit("setBinary", binary);
     },
     async initBinary({dispatch, state}) {
-        dispatch("setBinary", state.file);
+        await dispatch("setBinary", state.file);
     }
 }
 
