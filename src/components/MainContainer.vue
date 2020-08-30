@@ -12,8 +12,13 @@ div.main-container-component
         div.store-in-memory
           label
             input(type="checkbox" v-model="storeInMemory")
-            | Store in memory {{ binaryLoading ? ' (loadings...)' : '' }}
-            span(title="loaded in" v-if="loadingToMemoryTime && storeInMemory && inputBinary !== null")
+            | Store in memory
+            |
+            span(v-if="error" :title="error.name + ': ' + error.message" class="red")
+              | (error...)
+            span(v-else-if="binaryLoading")
+              | (loadings...)
+            span(title="loaded in" v-else-if="loadingToMemoryTime && storeInMemory && inputBinary !== null")
               | (
               FormattedNumber(:number="loadingToMemoryTime")
               |
@@ -48,31 +53,7 @@ div.main-container-component
             label
               | FPS
               input(type="number" v-model="fps")
-
-  div.input-switch
-    div.switch-line
-      | Input:
-      label
-        input(type="radio" name="input" value="text" v-model="activeInputType")
-        | Text
-      label
-        input(type="radio" name="input" value="file" v-model="activeInputType")
-        | File
-      label(
-          class="input-switch-checkbox"
-          title="Switch the input type automatically based on the corresponding input change")
-        input(type="checkbox" v-model="activeInputTypeAutoSwitcher")
-        | Auto-Switch
-    div.input-info
-      | Input size:
-      |
-      span(class="red" v-if="activeInputType === 'file' && inputFile === null")
-        | no file selected
-      span(v-else)
-        FormattedNumber(:number="inputByteSize")
-        |
-        | bytes
-
+  InputSwitch(:store-in-memory="storeInMemory")
   div.items
     HasherItem(
         v-for="(hasher, index) of hashers"
@@ -97,6 +78,7 @@ div.main-container-component
 import HasherItem from "./HasherItem.vue";
 import FileInputDragNDrop from "./FileInputDragNDrop.vue";
 import TextInput from "./TextInput.vue";
+import InputSwitch from "./InputSwitch.vue";
 import FormattedNumber from "./FormattedNumber.vue";
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
@@ -113,8 +95,6 @@ export default {
       animation: true,
       fps: 25,
       readerChunkSizeMB: 2,
-      activeInputType: "text",
-      activeInputTypeAutoSwitcher: true,
     }
   },
   computed: {
@@ -125,23 +105,15 @@ export default {
 
       binaryLoading: state => state.binaryLoading,
       loadingToMemoryTime: state => state.loadingToMemoryTime,
+
+      error: state => state.error,
     }),
-    ...mapGetters("input", ["textByteSize", "fileByteSize"]),
 
-    // loadingToMemoryTime: {
-    //   set(value) { this.$store.commit("input/loadingToMemoryTime", value); },
-    //   get() { return this.$store.state["input"].loadingToMemoryTime; }
-    // },
+    ...mapState("input-switch", {
+      activeInputType: state => state.activeInputType,
+      activeInputTypeAutoSwitcher: state => state.activeInputTypeAutoSwitcher,
+    }),
 
-    inputByteSize() {
-      if (this.activeInputType === "text") {
-        return this.textByteSize;
-      }
-      if (this.activeInputType === "file" && this.inputFile) {
-        return this.fileByteSize;
-      }
-      return 0;
-    },
     input() {
       if (this.activeInputType === "file") {
         return this.inputBinary || this.inputFile;
@@ -153,48 +125,7 @@ export default {
       return Math.trunc(Number(this.readerChunkSizeMB) * 1024 * 1024);
     },
   },
-  watch: {
-    async storeInMemory() {
-      if (this.storeInMemory) {
-        if (this.inputFile) {
-          await this.initBinary();
-        }
-      } else {
-        this.clearBinary();
-      }
-    },
-    async inputFile() {
-      if (this.activeInputTypeAutoSwitcher) {
-        this.activeInputType = "file";
-      }
-      if (this.activeInputType === "file") {
-        bus.$emit("input-changed");
-      }
-
-      if (this.storeInMemory) {
-        if (this.inputFile) {
-          await this.initBinary();
-        } else {
-          this.clearBinary();
-        }
-      }
-    },
-
-    inputText() {
-      if (this.activeInputTypeAutoSwitcher) {
-        this.activeInputType = "text";
-      }
-      if (this.activeInputType === "text") {
-        bus.$emit("input-changed");
-      }
-    },
-    activeInputType() {
-      bus.$emit("input-changed");
-    },
-  },
   methods: {
-    ...mapActions("input", ["initBinary"]),
-    ...mapMutations("input", ["clearBinary"]),
     async computeAll() {
       bus.$emit("input-changed"); // todo rename
       for (const item of this.$refs.items) {
@@ -203,11 +134,17 @@ export default {
       }
     },
   },
+  watch: {
+    error() {
+      this.storeInMemory = false;
+    },
+  },
   components: {
     TextInput,
     FileInputDragNDrop,
     FormattedNumber,
     HasherItem,
+    InputSwitch
   }
 };
 </script>
@@ -231,7 +168,7 @@ export default {
     justify-content: center;
 
     > * {
-      margin: 4px 0px;
+      margin: 4px 0;
     }
 
     .selected-input {
@@ -279,7 +216,7 @@ export default {
           &.invalid {
             border: 2px solid var(--red);
             outline: none;
-            box-shadow: 0px 0px 1px 0px var(--red);
+            box-shadow: 0 0 1px 0 var(--red);
           }
         }
       }
@@ -291,7 +228,7 @@ export default {
     margin-top: 12px;
     margin-bottom: 24px;
     > * {
-      padding: 0px 2px;
+      padding: 0 2px;
     }
     > div {
       padding-bottom: 6px;

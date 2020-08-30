@@ -19,11 +19,15 @@ const watcher = watch(watchOptions);
 // "Multiple conflicting contents for sourcemap source" error
 // forces me to use the whole `build` function
 
+let i = -1;
 watcher.on("event", async event => {
     if (event.code === "START") {
-        console.time("rebuilt");
+        if (++i === 0) {
+            return;
+        }
+        console.time("rebuilt [" + i + "]");
         await bundle(true);
-        console.timeEnd("rebuilt");
+        console.timeEnd("rebuilt [" + i + "]");
     }
 });
 
