@@ -223,27 +223,6 @@ export default {
     }
   }
 
-  .input-switch {
-    padding: 6px;
-    margin-top: 12px;
-    margin-bottom: 24px;
-    > * {
-      padding: 0 2px;
-    }
-    > div {
-      padding-bottom: 6px;
-    }
-
-    .input-switch-checkbox {
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      &:hover {
-        opacity: 1;
-        transition: opacity 0.25s ease;
-      }
-    }
-  }
-
   .red {
     color: var(--red);
   }
