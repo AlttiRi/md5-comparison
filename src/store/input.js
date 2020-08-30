@@ -3,8 +3,13 @@ const state = () => ({
     text: "",
     /** @type {File} */
     file: null,
+
     /** @type {ArrayBuffer} */
     binary: null,
+    /** @type {Boolean} */
+    binaryLoading: false,
+    /** @type {Number} */
+    loadingToMemoryTime: null
 });
 
 const getters = {};
@@ -15,10 +20,17 @@ const actions = {
      * @param {File} file
      */
     async setBinary({commit}, file) {
+        commit("binaryLoading", true);
+        commit("loadingToMemoryTime", null);
+        const now = performance.now();
+
         const binary = await file.arrayBuffer();                                            // [1]
         /* just to compare arrayBuffer() with FileReader */
         // const binary == await (Util.iterateBlob1(this.inputFile, 1024**4).next()).value; // [2]
         commit("setBinary", binary);
+
+        commit("binaryLoading", false);
+        commit("loadingToMemoryTime", performance.now() - now);
     },
     async initBinary({dispatch, state}) {
         await dispatch("setBinary", state.file);
@@ -45,7 +57,14 @@ const mutations = {
     },
     clearBinary(state) {
         state.binary = null;
-    }
+    },
+
+    binaryLoading(state, binaryLoading) {
+        state.binary = binaryLoading;
+    },
+    loadingToMemoryTime(state, loadingToMemoryTime) {
+        state.loadingToMemoryTime = loadingToMemoryTime;
+    },
 };
 
 

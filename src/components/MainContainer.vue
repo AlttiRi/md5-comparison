@@ -109,8 +109,6 @@ export default {
     return {
       hashers: MD5.list,
       storeInMemory: false,
-      binaryLoading: false,
-      loadingToMemoryTime: 0,
       streamType: "FileReader",
       animation: true,
       fps: 25,
@@ -125,6 +123,15 @@ export default {
       inputFile: state => state.file,
       inputBinary: state => state.binary
     }),
+    binaryLoading: {
+    //set(value) { this.$store.commit("input/binaryLoading", value); },
+      get() { return this.$store.state["input"].binaryLoading; }
+    },
+    loadingToMemoryTime: {
+    //set(value) { this.$store.commit("input/loadingToMemoryTime", value); },
+      get() { return this.$store.state["input"].loadingToMemoryTime; }
+    },
+
     inputByteSize() {
       if (this.activeInputType === "text") {
         return new TextEncoder().encode(this.inputText).byteLength;
@@ -146,24 +153,42 @@ export default {
     },
   },
   watch: {
-    inputFile() {
+    async storeInMemory() {
+      if (this.storeInMemory) {
+        if (this.inputFile) {
+          await this.initBinary();
+        }
+      } else {
+        this.clearBinary();
+      }
+    },
+    async inputFile() {
       if (this.activeInputTypeAutoSwitcher) {
         this.activeInputType = "file";
       }
-      bus.$emit("input-changed");
-      this.updateInputBinary();
+      if (this.activeInputType === "file") {
+        bus.$emit("input-changed");
+      }
+
+      if (this.storeInMemory) {
+        if (this.inputFile) {
+          await this.initBinary();
+        } else {
+          this.clearBinary();
+        }
+      }
     },
+
     inputText() {
       if (this.activeInputTypeAutoSwitcher) {
         this.activeInputType = "text";
       }
-      bus.$emit("input-changed");
+      if (this.activeInputType === "text") {
+        bus.$emit("input-changed");
+      }
     },
     activeInputType() {
       bus.$emit("input-changed");
-    },
-    storeInMemory() {
-      this.updateInputBinary();
     },
   },
   methods: {
@@ -176,19 +201,6 @@ export default {
         await new Promise(resolve => Util.setImmediate(resolve));
       }
     },
-    async updateInputBinary() {
-      // load file to the memory
-      if (this.storeInMemory && this.inputFile) {
-        this.loadingToMemoryTime = null;
-        this.binaryLoading = true;
-        const now = performance.now();
-        await this.initBinary(); //await this.setBinary(this.inputFile);
-        this.loadingToMemoryTime = performance.now() - now;
-        this.binaryLoading = false;
-      } else {
-        this.clearBinary(); //todo do on uncheck
-      }
-    }
   },
   components: {
     TextInput,

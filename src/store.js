@@ -2,13 +2,17 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import input from "./store/input.js";
+// import fileSettings from "./store/file-settings.js";
+import inputSwitch from "./store/input-switch.js";
 
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
-        input
+        input,
+        // ["file-settings"]: fileSettings,
+        ["input-switch"]: inputSwitch
     },
     plugins: [logger]
 });
