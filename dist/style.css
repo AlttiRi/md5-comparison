@@ -1,13 +1,13 @@
 /* MainContainer.vue */
-.main-container-component[data-v-5699fc21] .formatted-number .trio > .padded {
+.main-container-component[data-v-bb62e156] .formatted-number .trio > .padded {
   letter-spacing: 4px;
 }
-.main-container-component[data-v-5699fc21] {
+.main-container-component[data-v-bb62e156] {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.main-container-component .inputs[data-v-5699fc21] {
+.main-container-component .inputs[data-v-bb62e156] {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -15,81 +15,62 @@
   align-items: center;
   justify-content: center;
 }
-.main-container-component .inputs > *[data-v-5699fc21] {
+.main-container-component .inputs > *[data-v-bb62e156] {
   margin: 4px 0;
 }
-.main-container-component .inputs .selected-input[data-v-5699fc21] {
+.main-container-component .inputs .selected-input[data-v-bb62e156] {
   border: solid 1px var(--selected-input-border);
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--selected-input-box-shadow);
 }
-.main-container-component .inputs .text-input-wrapper[data-v-5699fc21] {
+.main-container-component .inputs .text-input-wrapper[data-v-bb62e156] {
   display: flex;
   align-self: stretch;
   width: 312px;
 }
-.main-container-component .inputs .file-group[data-v-5699fc21] {
+.main-container-component .inputs .file-group[data-v-bb62e156] {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
 }
-.main-container-component .inputs .file-group > div[data-v-5699fc21] {
+.main-container-component .inputs .file-group > div[data-v-bb62e156] {
   width: 312px;
   min-height: 6em;
 }
-.main-container-component .inputs .file-group .settings[data-v-5699fc21] {
+.main-container-component .inputs .file-group .settings[data-v-bb62e156] {
   width: 320px;
   padding: 6px 8px;
   box-sizing: border-box;
 }
-.main-container-component .inputs .file-group .settings.inactive[data-v-5699fc21] {
+.main-container-component .inputs .file-group .settings.inactive[data-v-bb62e156] {
   opacity: 0.5;
 }
-.main-container-component .inputs .file-group .settings > *[data-v-5699fc21] {
+.main-container-component .inputs .file-group .settings > *[data-v-bb62e156] {
   margin: 6px;
 }
-.main-container-component .inputs .file-group .settings input[type=number][data-v-5699fc21] {
+.main-container-component .inputs .file-group .settings input[type=number][data-v-bb62e156] {
   max-width: 42px;
   margin-left: 4px;
   margin-top: 4px;
 }
-.main-container-component .inputs .file-group .settings input[type=number].invalid[data-v-5699fc21] {
+.main-container-component .inputs .file-group .settings input[type=number].invalid[data-v-bb62e156] {
   border: 2px solid var(--red);
   outline: none;
   box-shadow: 0 0 1px 0 var(--red);
 }
-.main-container-component .input-switch[data-v-5699fc21] {
-  padding: 6px;
-  margin-top: 12px;
-  margin-bottom: 24px;
-}
-.main-container-component .input-switch > *[data-v-5699fc21] {
-  padding: 0 2px;
-}
-.main-container-component .input-switch > div[data-v-5699fc21] {
-  padding-bottom: 6px;
-}
-.main-container-component .input-switch .input-switch-checkbox[data-v-5699fc21] {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-.main-container-component .input-switch .input-switch-checkbox[data-v-5699fc21]:hover {
-  opacity: 1;
-  transition: opacity 0.25s ease;
-}
-.main-container-component .red[data-v-5699fc21] {
+.main-container-component .red[data-v-bb62e156] {
   color: var(--red);
 }
-.main-container-component .items[data-v-5699fc21] {
+.main-container-component .items[data-v-bb62e156] {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
 }
-.main-container-component .interface[data-v-5699fc21] {
+.main-container-component .interface[data-v-bb62e156] {
   display: flex;
   justify-content: center;
   margin: 4px;
@@ -98,12 +79,12 @@
 /* scrollbar breaks it a bit for 961px - 974px */
 /* todo use grid */
 @media all and (min-width: 640px) and (max-width: 960px) {
-.main-container-component .inputs .text-input-wrapper[data-v-5699fc21] {
+.main-container-component .inputs .text-input-wrapper[data-v-bb62e156] {
     width: 632px;
 }
 }
 @media all and (min-width: 960px) {
-.main-container-component .inputs > *[data-v-5699fc21] {
+.main-container-component .inputs > *[data-v-bb62e156] {
     margin-left: 4px;
     margin-right: 4px;
 }
@@ -189,6 +170,28 @@
 }
 }
 
+/* TextInput.vue */
+.text-input-component[data-v-553cd546] {
+  border: solid 1px var(--textarea-wrapper-border);
+  box-sizing: border-box;
+  width: 100%;
+}
+.text-input-component textarea[data-v-553cd546] {
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  height: 100%;
+  border: 0;
+  outline: none;
+  min-height: 100px;
+  padding: 5px;
+  font-size: 17px;
+}
+.text-input-component textarea[data-v-553cd546]:focus::placeholder {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
 /* FileInputDragNDrop.vue */
 .file-input-drag-n-drop-component[data-v-8f729f64] {
   transition: background-color 0.1s;
@@ -230,28 +233,6 @@
 }
 .file-input-drag-n-drop-component #add-files-button[data-v-8f729f64] {
   font-size: 18px;
-}
-
-/* TextInput.vue */
-.text-input-component[data-v-553cd546] {
-  border: solid 1px var(--textarea-wrapper-border);
-  box-sizing: border-box;
-  width: 100%;
-}
-.text-input-component textarea[data-v-553cd546] {
-  width: 100%;
-  box-sizing: border-box;
-  display: block;
-  height: 100%;
-  border: 0;
-  outline: none;
-  min-height: 100px;
-  padding: 5px;
-  font-size: 17px;
-}
-.text-input-component textarea[data-v-553cd546]:focus::placeholder {
-  opacity: 0;
-  transition: opacity 0.25s ease;
 }
 
 /* InputSwitch.vue */
