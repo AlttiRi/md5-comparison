@@ -96,6 +96,7 @@ export default {
   align-items: center;
 
   .inputs {
+    margin-top: 12px;
     width: 100%;
     display: flex;
     flex-direction: row;
