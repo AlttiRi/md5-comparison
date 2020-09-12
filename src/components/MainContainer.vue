@@ -1,5 +1,6 @@
 <template lang="pug">
 div.main-container-component
+  MemoryConsuming
   div.inputs
     div.text-input-wrapper
       TextInput(:class="{'selected-input': activeInputType === 'text'}")
@@ -80,6 +81,8 @@ import FileInputDragNDrop from "./FileInputDragNDrop.vue";
 import TextInput from "./TextInput.vue";
 import InputSwitch from "./InputSwitch.vue";
 import FormattedNumber from "./FormattedNumber.vue";
+import MemoryConsuming from "./MemoryConsuming.vue";
+
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
 import MD5 from "../md5-provider.js";
@@ -144,7 +147,8 @@ export default {
     FileInputDragNDrop,
     FormattedNumber,
     HasherItem,
-    InputSwitch
+    InputSwitch,
+    MemoryConsuming
   }
 };
 </script>
@@ -155,6 +159,8 @@ export default {
 }
 
 .main-container-component {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
