@@ -16,7 +16,7 @@ div.hasher-item-component(:class="computing ? 'computing' : null")
         | Compute
       button(
           @click="streamCompute"
-          :disabled="!hasher.updateSupported || streamMode === 'String' || settings.readerChunkSize < 1"
+          :disabled="!hasher.updateSupported || streamMode === 'String' || readerChunkSize < 1"
           :title="unsupportedStreamMethodMessage || streamMethodMessage")
         | Stream Compute
 
@@ -51,12 +51,13 @@ div.hasher-item-component(:class="computing ? 'computing' : null")
 import FormattedNumber from "./FormattedNumber.vue";
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
+import {mapState, mapGetters} from "vuex";
 
 export default {
   created() {
     bus.$on("input-changed", this.onInputChanged);
   },
-  props: ["hasher", "input", "settings"],
+  props: ["hasher", "input"],
   methods: {
     onInputChanged() {
       this.newInput = true;
@@ -81,7 +82,7 @@ export default {
           this.loadingToMemoryTime = performance.now() - start;
         } else {
           input = this.input;
-          this.loadingToMemoryTime = this.settings.loadingToMemoryTime;
+          this.loadingToMemoryTime = this._loadingToMemoryTime;
         }
         this.$forceUpdate();
         await new Promise(resolve => setTimeout(resolve, 16));
@@ -104,8 +105,8 @@ export default {
       this.loadingToMemoryTime = null;
 
       if (this.streamMode === "FileReader") {
-        console.log(this.settings.readerChunkSize);
-        await _hashIterable(Util.iterateBlob2(this.input, this.settings.readerChunkSize), this.input.size);
+        console.log(this.readerChunkSize);
+        await _hashIterable(Util.iterateBlob2(this.input, this.readerChunkSize), this.input.size);
       } else if (this.streamMode === "ReadableStream") {
         await _hashIterable(Util.iterateReadableStream(this.input.stream()), this.input.size);
       } else if (this.streamMode === "ArrayBuffer") {
@@ -119,12 +120,11 @@ export default {
         const start = performance.now();
         let curTime = start;
         let totalRead = 0;
-        const settings = self.settings;
         self.progress = 0;
         for await (const data of iterable) {
-          if (settings.animation) {
+          if (self.animation) {
             const newTime = performance.now();
-            if (newTime - curTime > (1000 / settings.fps)) {
+            if (newTime - curTime > (1000 / self.fps)) {
               curTime = newTime;
               self.progress = (totalRead / length) * 100;
               await new Promise(resolve => Util.setImmediate(resolve));
@@ -152,6 +152,17 @@ export default {
     }
   },
   computed: {
+    ...mapState("file-settings", {
+      animation: state => state.animation,
+      fps: state => state.fps,
+      streamType: state => state.streamType,
+    }),
+    ...mapGetters("file-settings", ["readerChunkSize"]),
+
+    ...mapState("input", {
+      _loadingToMemoryTime: state => state.loadingToMemoryTime,
+    }),
+
     streamMethodMessage() {
       if (this.streamMode === "ArrayBuffer") {
         return "Iterate ArrayBuffer chunks of the file loaded in the memory";
@@ -186,10 +197,10 @@ export default {
       if (Util.isArrayBuffer(this.input)) {
         return "ArrayBuffer"
       } else if (Util.isBlob(this.input)) {
-        if (this.settings.streamType === "FileReader") {
+        if (this.streamType === "FileReader") {
           return "FileReader"
         }
-        if (this.settings.streamType === "ReadableStream") {
+        if (this.streamType === "ReadableStream") {
           return "ReadableStream"
         }
       }

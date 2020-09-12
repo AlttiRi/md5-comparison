@@ -26,36 +26,48 @@ const getters = {
 
 const actions = {
     async setBinary({commit, state}, /** @type {File}*/ file) {
-        commit("binaryLoading", true);
-        commit("loadingToMemoryTime", null);
-
+        commit("_binaryLoading", true);
         if (state.error) {
-            commit("resetError");
+            commit("_clearError");
         }
 
-        const now = performance.now();
-
-        let binary;
         try {
-            binary = await file.arrayBuffer();                                 // [1]
+            const now = performance.now();
+            const binary = await file.arrayBuffer();                           // [1]
             /* just to compare arrayBuffer() with FileReader */
             // binary = await (Util.iterateBlob1(file, 1024**4).next()).value; // [2]
+
+            commit("_binary", binary);
+            commit("_loadingToMemoryTime", performance.now() - now);
         } catch (error) {
             // When there is not enough memory space:
             // DOMException:
             // The requested file could not be read, typically due to permission problems
             // that have occurred after a reference to a file was acquired.
             console.error(error);
-            commit("error", error);  // error.name === NotReadableError
+            commit("_error", error);  // error.name === NotReadableError
         }
-        commit("setBinary", binary);
-
-        commit("binaryLoading", false);
-        commit("loadingToMemoryTime", performance.now() - now);
+        commit("_binaryLoading", false);
     },
     async initBinary({dispatch, state}) {
         await dispatch("setBinary", state.file);
-    }
+    },
+    clearBinary({commit, state}) {
+        if (state.binary) {
+            commit("_binary", null);
+            commit("_loadingToMemoryTime", null);
+        }
+    },
+
+    setFile({commit, state}, file) {
+        if (state.error) {
+            commit("_clearError");
+        }
+        commit("_file", file);
+    },
+    clearFile({dispatch}) {
+        dispatch("setFile", null);
+    },
 }
 
 const mutations = {
@@ -66,31 +78,23 @@ const mutations = {
         state.text = "";
     },
 
-    setFile(state, file) {
+    _file(state, file) {
         state.file = file;
     },
-    clearFile(state) {
-        state.file = null;
-    },
-
-    setBinary(state, binary) {
+    _binary(state, binary) {
         state.binary = binary;
     },
-    clearBinary(state) {
-        state.binary = null;
-    },
-
-    binaryLoading(state, binaryLoading) {
+    _binaryLoading(state, binaryLoading) {
         state.binaryLoading = binaryLoading;
     },
-    loadingToMemoryTime(state, loadingToMemoryTime) {
+    _loadingToMemoryTime(state, loadingToMemoryTime) {
         state.loadingToMemoryTime = loadingToMemoryTime;
     },
 
-    error(state, error) {
+    _error(state, error) {
         state.error = error;
     },
-    resetError(state) {
+    _clearError(state) {
         state.error = null;
     }
 };

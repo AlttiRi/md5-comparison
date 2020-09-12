@@ -27,12 +27,15 @@ div.input-switch
 <script>
 import {bus} from "./bus.js";
 import FormattedNumber from "./FormattedNumber.vue";
-import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+import {mapActions, mapGetters, mapState} from "vuex";
 
 export default {
   name: "InputSwitch",
-  props: ["storeInMemory"],
   computed: {
+    ...mapState("file-settings", {
+      storeInMemory: state => state.storeInMemory,
+    }),
+
     ...mapState("input", {
       inputText: state => state.text,
       inputFile: state => state.file,
@@ -59,14 +62,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions("input", ["initBinary"]),
-    ...mapMutations("input", ["clearBinary", "resetError"]),
-  },
-  watch: {
-    activeInputType() {
-      bus.$emit("input-changed");
-    },
-    async storeInMemory() {
+    ...mapActions("input", ["initBinary", "clearBinary"]),
+    async updateBinary() {
       if (this.storeInMemory) {
         if (this.inputFile) {
           await this.initBinary();
@@ -74,30 +71,27 @@ export default {
       } else {
         this.clearBinary();
       }
+    }
+  },
+  watch: {
+    activeInputType() {
+      bus.$emit("input-changed");
+    },
+    async storeInMemory() {
+      await this.updateBinary();
     },
     async inputFile() {
-      this.resetError();
-
-      if (this.activeInputTypeAutoSwitcher) {
+      if (this.activeInputTypeAutoSwitcher && this.activeInputType !== "file") {
         this.activeInputType = "file";
-      }
-      if (this.activeInputType === "file") {
+      } else {
         bus.$emit("input-changed");
       }
-
-      if (this.storeInMemory) {
-        if (this.inputFile) {
-          await this.initBinary();
-        } else {
-          this.clearBinary();
-        }
-      }
+      await this.updateBinary();
     },
     inputText() {
-      if (this.activeInputTypeAutoSwitcher) {
+      if (this.activeInputTypeAutoSwitcher && this.activeInputType !== "text") {
         this.activeInputType = "text";
-      }
-      if (this.activeInputType === "text") {
+      } else {
         bus.$emit("input-changed");
       }
     },

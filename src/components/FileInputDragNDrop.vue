@@ -22,7 +22,7 @@ div.file-input-drag-n-drop-component(
 
 <script>
 import * as Util from "../util.js";
-import {mapMutations, mapState} from "vuex";
+import {mapActions, mapState} from "vuex";
 
 export default {
   data() {
@@ -36,7 +36,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations("input", ["setFile"]),
+    ...mapActions("input", ["setFile"]),
 
     secondsToFormattedString: Util.secondsToFormattedString,
     bytesToSize: Util.bytesToSize,

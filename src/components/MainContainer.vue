@@ -8,68 +8,15 @@ div.main-container-component
       FileInputDragNDrop(
           :class="{'selected-input': activeInputType === 'file'}"
           ref="fileInputComponent")
-
-      div.settings(:class="{inactive: activeInputType !== 'file'}")
-        div.store-in-memory
-          label
-            input(type="checkbox" v-model="storeInMemory")
-            | Store in memory
-            |
-            span(v-if="error" :title="error.name + ': ' + error.message" class="red")
-              | (error...)
-            span(v-else-if="binaryLoading")
-              | (loadings...)
-            span(title="loaded in" v-else-if="loadingToMemoryTime && storeInMemory")
-              | (
-              FormattedNumber(:number="loadingToMemoryTime")
-              |
-              | ms)
-
-        div.stream-type
-          div(:style="{opacity: storeInMemory ? 0.5 : 1}")
-            label
-              input(type="radio" name="streamType" value="FileReader" v-model="streamType")
-              | FileReader
-            label
-              input(type="radio" name="streamType" value="ReadableStream" v-model="streamType")
-              | ReadableStream
-
-          label(
-              title="Chunk size for progressive hashing, Megabytes"
-              :style="{opacity: streamType === 'ReadableStream' && !storeInMemory ? 0.5 : 1}")
-            | Chunk size, MB
-            input(
-                type="number" min="0.1" step="0.1"
-                v-model="readerChunkSizeMB"
-                :class="{invalid: readerChunkSize < 1}"
-                :title="readerChunkSize > 0 ? '' : 'Value must be greater than or equal to 1 byte'")
-
-        div.animation
-          span.checkbox
-            label
-              input(type="checkbox" v-model="animation")
-              | Animation,
-              |
-          span.fps(:style="{opacity: animation ? 1 : 0.5}")
-            label
-              | FPS
-              input(type="number" v-model="fps")
-  InputSwitch(:store-in-memory="storeInMemory")
+      FileSettings(:class="{inactive: activeInputType !== 'file'}")
+  InputSwitch
   div.items
     HasherItem(
         v-for="(hasher, index) of hashers"
         :hasher="hasher"
         :key="index"
         :input="input"
-        :settings=`{
-          fps,
-          animation,
-          readerChunkSize,
-          streamType,
-          loadingToMemoryTime
-        }`
         ref="items")
-
   div.interface
     button(@click="computeAll")
       | Compute all
@@ -82,39 +29,29 @@ import TextInput from "./TextInput.vue";
 import InputSwitch from "./InputSwitch.vue";
 import FormattedNumber from "./FormattedNumber.vue";
 import MemoryConsuming from "./MemoryConsuming.vue";
+import FileSettings from "./FileSettings.vue";
 
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
 import MD5 from "../md5-provider.js";
-import {mapActions, mapMutations, mapState, mapGetters} from "vuex";
+import {mapState} from "vuex";
 
 export default {
   name: "MainContainer",
   data() {
     return {
-      hashers: MD5.list,
-      storeInMemory: false,
-      streamType: "FileReader",
-      animation: true,
-      fps: 25,
-      readerChunkSizeMB: 2,
+      hashers: MD5.list
     }
   },
   computed: {
     ...mapState("input", {
       inputText: state => state.text,
       inputFile: state => state.file,
-      inputBinary: state => state.binary,
-
-      binaryLoading: state => state.binaryLoading,
-      loadingToMemoryTime: state => state.loadingToMemoryTime,
-
-      error: state => state.error,
+      inputBinary: state => state.binary
     }),
 
     ...mapState("input-switch", {
-      activeInputType: state => state.activeInputType,
-      activeInputTypeAutoSwitcher: state => state.activeInputTypeAutoSwitcher,
+      activeInputType: state => state.activeInputType
     }),
 
     input() {
@@ -123,10 +60,7 @@ export default {
       } else if (this.activeInputType === "text") {
         return this.inputText;
       }
-    },
-    readerChunkSize() {
-      return Math.trunc(Number(this.readerChunkSizeMB) * 1024 * 1024);
-    },
+    }
   },
   methods: {
     async computeAll() {
@@ -137,18 +71,14 @@ export default {
       }
     },
   },
-  watch: {
-    error() {
-      this.storeInMemory = false;
-    },
-  },
   components: {
     TextInput,
     FileInputDragNDrop,
     FormattedNumber,
     HasherItem,
     InputSwitch,
-    MemoryConsuming
+    MemoryConsuming,
+    FileSettings
   }
 };
 </script>
@@ -200,37 +130,7 @@ export default {
         width: 312px;
         min-height: 6em;
       }
-
-      .settings {
-        width: 320px;
-        padding: 6px 8px;
-        box-sizing: border-box;
-
-        &.inactive {
-          opacity: 0.5;
-        }
-
-        > * {
-          margin: 6px;
-        }
-
-        input[type="number"] {
-          max-width: 42px;
-          margin-left: 4px;
-          margin-top: 4px;
-
-          &.invalid {
-            border: 2px solid var(--red);
-            outline: none;
-            box-shadow: 0 0 1px 0 var(--red);
-          }
-        }
-      }
     }
-  }
-
-  .red {
-    color: var(--red);
   }
 
   .items {
