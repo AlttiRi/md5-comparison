@@ -172,6 +172,28 @@
 }
 }
 
+/* TextInput.vue */
+.text-input-component[data-v-553cd546] {
+  border: solid 1px var(--textarea-wrapper-border);
+  box-sizing: border-box;
+  width: 100%;
+}
+.text-input-component textarea[data-v-553cd546] {
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  height: 100%;
+  border: 0;
+  outline: none;
+  min-height: 100px;
+  padding: 5px;
+  font-size: 17px;
+}
+.text-input-component textarea[data-v-553cd546]:focus::placeholder {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
 /* FileInputDragNDrop.vue */
 .file-input-drag-n-drop-component[data-v-403332ae] {
   transition: background-color 0.1s;
@@ -213,28 +235,6 @@
 }
 .file-input-drag-n-drop-component #add-files-button[data-v-403332ae] {
   font-size: 18px;
-}
-
-/* TextInput.vue */
-.text-input-component[data-v-553cd546] {
-  border: solid 1px var(--textarea-wrapper-border);
-  box-sizing: border-box;
-  width: 100%;
-}
-.text-input-component textarea[data-v-553cd546] {
-  width: 100%;
-  box-sizing: border-box;
-  display: block;
-  height: 100%;
-  border: 0;
-  outline: none;
-  min-height: 100px;
-  padding: 5px;
-  font-size: 17px;
-}
-.text-input-component textarea[data-v-553cd546]:focus::placeholder {
-  opacity: 0;
-  transition: opacity 0.25s ease;
 }
 
 /* InputSwitch.vue */
