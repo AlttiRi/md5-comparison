@@ -36,7 +36,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations("input", ["setFile", "clearFile"]),
+    ...mapMutations("input", ["setFile"]),
 
     secondsToFormattedString: Util.secondsToFormattedString,
     bytesToSize: Util.bytesToSize,

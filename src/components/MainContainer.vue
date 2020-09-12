@@ -19,7 +19,7 @@ div.main-container-component
               | (error...)
             span(v-else-if="binaryLoading")
               | (loadings...)
-            span(title="loaded in" v-else-if="loadingToMemoryTime && storeInMemory && inputBinary !== null")
+            span(title="loaded in" v-else-if="loadingToMemoryTime && storeInMemory")
               | (
               FormattedNumber(:number="loadingToMemoryTime")
               |

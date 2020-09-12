@@ -52,10 +52,10 @@ export default {
       if (this.activeInputType === "text") {
         return this.textByteSize;
       }
-      if (this.activeInputType === "file" && this.inputFile) {
+      if (this.activeInputType === "file") {
         return this.fileByteSize;
       }
-      return 0;
+      return null;
     }
   },
   methods: {
