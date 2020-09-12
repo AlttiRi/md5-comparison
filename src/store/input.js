@@ -20,7 +20,7 @@ const getters = {
         return new TextEncoder().encode(state.text).byteLength;
     },
     fileByteSize(state, getters) {
-        return state.file.size; // `state.binary.byteLength` for binary
+        return state.file ? state.file.size : null; // `state.binary.byteLength` for binary
     },
 };
 
