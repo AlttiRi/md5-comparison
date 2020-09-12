@@ -25,7 +25,7 @@ export const inputOptions = {
         }),
         appendFinally(sourceMappingURL(filename))
     ],
-    external: ["vue"], // I load it from CDN
+    external: ["vue", "vuex"], // I load it from CDN
 };
 
 /** @type {import("rollup").OutputOptions} */
