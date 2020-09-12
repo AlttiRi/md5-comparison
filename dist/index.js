@@ -1096,7 +1096,7 @@
           return new TextEncoder().encode(state.text).byteLength;
       },
       fileByteSize(state, getters) {
-          return state.file.size; // `state.binary.byteLength` for binary
+          return state.file ? state.file.size : null; // `state.binary.byteLength` for binary
       },
   };
 
@@ -1200,6 +1200,104 @@
       mutations: mutations$1
   };
 
+  const setImmediate = /*#__PURE__*/ (function() {
+      const {port1, port2} = new MessageChannel();
+      const queue = [];
+
+      port1.onmessage = function() {
+          const callback = queue.shift();
+          callback();
+      };
+
+      return function(callback) {
+          port2.postMessage(null);
+          queue.push(callback);
+      };
+  })();
+
+
+  async function * iterateReadableStream(stream) {
+      const reader = stream.getReader();
+      while (true) {
+          const {done, /** @type {Uint8Array} */ value} = await reader.read();
+          if (done) {
+              break;
+          }
+          yield value;
+      }
+  }
+
+  // chunkSize is 65536, ReadableStream uses the same size.
+  // There is no speed difference between using of different the chunk's sizes.
+  function * iterateArrayBuffer(arrayBuffer, chunkSize = 65536) {
+      const buffer = new Uint8Array(arrayBuffer);
+      let index = 0;
+      while (true) {
+          const chunk = buffer.subarray(index, index + chunkSize);
+          if (!chunk.length) {
+              break;
+          }
+          yield chunk;
+          index += chunkSize;
+      }
+  }
+
+  // It works with the same speed in Chromium, but faster in Firefox
+  function * iterateBlob2(blob, chunkSize = 2 * 1024 * 1024) {
+      let index = 0;
+      while (true) {
+          const blobChunk = blob.slice(index, index + chunkSize);
+          if (!blobChunk.size) {break;}
+
+          yield read(blobChunk);
+          index += chunkSize;
+      }
+
+      async function read(blob) {
+          return new Uint8Array(await blob.arrayBuffer());
+      }
+  }
+
+
+  function isArrayBuffer(data) {
+      return data instanceof ArrayBuffer;
+  }
+  function isBinary(data) {
+      return isArrayBuffer(data) || ArrayBuffer.isView(data);
+  }
+  function isString(data) {
+      return typeof data === "string" || data instanceof String;
+  }
+  function isBlob(data) { // is it Blob or File
+      return data instanceof Blob;
+  }
+
+
+  function secondsToFormattedString(seconds) {
+      const date = new Date(seconds * 1000);
+
+      // Adds zero padding
+      function pad(str) {
+          return str.toString().padStart(2, "0");
+      }
+
+      return date.getFullYear() + "." + pad(date.getMonth() + 1) + "." + pad(date.getDate()) + " " +
+          pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds());
+  }
+
+
+  function bytesToSize(bytes, decimals = 2) {
+      if (bytes === 0) {
+          return "0 B";
+      }
+      const k = 1024;
+      decimals = decimals < 0 ? 0 : decimals;
+      const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + " " + sizes[i];
+  }
+
   Vue__default['default'].use(index);
 
   var store = new index.Store({
@@ -1213,7 +1311,27 @@
 
   function logger(store) {
       store.subscribe((mutation/*, state*/) => {
-          console.log(mutation);
+          // to prevent the large memory leak
+          if (isBinary(mutation.payload)) {
+              const binary = mutation.payload;
+
+              if (isArrayBuffer(binary)) {
+                  console.log({
+                      type: mutation.type,
+                      payload: "ArrayBuffer(" + binary.byteLength + ")",
+                      payloadPreview: new Uint8Array(binary).slice(0, 1024).buffer
+                  });
+              } else {
+                  const cellSize = binary.slice(0, 1).byteLength || 1; // if `length === 0`
+                  console.log({
+                      type: mutation.type,
+                      payload: binary[Symbol.toStringTag] + "(" + binary.length + ")",
+                      payloadPreview: binary.slice(0, 1024 / cellSize)
+                  });
+              }
+          } else {
+              console.log(mutation);
+          }
       });
   }
 
@@ -1539,101 +1657,6 @@
     );
 
   const bus = new Vue__default['default']();
-
-  const setImmediate = /*#__PURE__*/ (function() {
-      const {port1, port2} = new MessageChannel();
-      const queue = [];
-
-      port1.onmessage = function() {
-          const callback = queue.shift();
-          callback();
-      };
-
-      return function(callback) {
-          port2.postMessage(null);
-          queue.push(callback);
-      };
-  })();
-
-
-  async function * iterateReadableStream(stream) {
-      const reader = stream.getReader();
-      while (true) {
-          const {done, /** @type {Uint8Array} */ value} = await reader.read();
-          if (done) {
-              break;
-          }
-          yield value;
-      }
-  }
-
-  // chunkSize is 65536, ReadableStream uses the same size.
-  // There is no speed difference between using of different the chunk's sizes.
-  function * iterateArrayBuffer(arrayBuffer, chunkSize = 65536) {
-      const buffer = new Uint8Array(arrayBuffer);
-      let index = 0;
-      while (true) {
-          const chunk = buffer.subarray(index, index + chunkSize);
-          if (!chunk.length) {
-              break;
-          }
-          yield chunk;
-          index += chunkSize;
-      }
-  }
-
-  // It works with the same speed in Chromium, but faster in Firefox
-  function * iterateBlob2(blob, chunkSize = 2 * 1024 * 1024) {
-      let index = 0;
-      while (true) {
-          const blobChunk = blob.slice(index, index + chunkSize);
-          if (!blobChunk.size) {break;}
-
-          yield read(blobChunk);
-          index += chunkSize;
-      }
-
-      async function read(blob) {
-          return new Uint8Array(await blob.arrayBuffer());
-      }
-  }
-
-
-  function isArrayBuffer(data) {
-      return data instanceof ArrayBuffer;
-  }
-  function isString(data) {
-      return typeof data === "string" || data instanceof String;
-  }
-  function isBlob(data) { // is it Blob or File
-      return data instanceof Blob;
-  }
-
-
-  function secondsToFormattedString(seconds) {
-      const date = new Date(seconds * 1000);
-
-      // Adds zero padding
-      function pad(str) {
-          return str.toString().padStart(2, "0");
-      }
-
-      return date.getFullYear() + "." + pad(date.getMonth() + 1) + "." + pad(date.getDate()) + " " +
-          pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds());
-  }
-
-
-  function bytesToSize(bytes, decimals = 2) {
-      if (bytes === 0) {
-          return "0 B";
-      }
-      const k = 1024;
-      decimals = decimals < 0 ? 0 : decimals;
-      const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + " " + sizes[i];
-  }
 
   //
 
@@ -1976,7 +1999,7 @@
       })
     },
     methods: {
-      ...mapMutations("input", ["setFile", "clearFile"]),
+      ...mapMutations("input", ["setFile"]),
 
       secondsToFormattedString: secondsToFormattedString,
       bytesToSize: bytesToSize,
@@ -2089,7 +2112,7 @@
     /* style */
     const __vue_inject_styles__$3 = undefined;
     /* scoped */
-    const __vue_scope_id__$3 = "data-v-8f729f64";
+    const __vue_scope_id__$3 = "data-v-403332ae";
     /* module identifier */
     const __vue_module_identifier__$3 = undefined;
     /* functional template */
@@ -2226,10 +2249,10 @@
         if (this.activeInputType === "text") {
           return this.textByteSize;
         }
-        if (this.activeInputType === "file" && this.inputFile) {
+        if (this.activeInputType === "file") {
           return this.fileByteSize;
         }
-        return 0;
+        return null;
       }
     },
     methods: {
@@ -2404,7 +2427,7 @@
     /* style */
     const __vue_inject_styles__$5 = undefined;
     /* scoped */
-    const __vue_scope_id__$5 = "data-v-2ef0864e";
+    const __vue_scope_id__$5 = "data-v-f83e6846";
     /* module identifier */
     const __vue_module_identifier__$5 = undefined;
     /* functional template */
@@ -2424,6 +2447,105 @@
       __vue_scope_id__$5,
       __vue_is_functional_template__$5,
       __vue_module_identifier__$5,
+      false,
+      undefined,
+      undefined,
+      undefined
+    );
+
+  //
+
+  var script$6 = {
+    name: "MemoryConsuming",
+    data() {
+      return {
+        memory: performance.memory,
+        intervalId: null,
+        over100: false
+      }
+    },
+    computed: {
+      jsHeapSizeLimit() {return this.memory.jsHeapSizeLimit},
+      totalJSHeapSize() {return this.memory.totalJSHeapSize},
+      usedJSHeapSize()  {return this.memory.usedJSHeapSize},
+      percent() {
+        const percent = this.totalJSHeapSize / (this.jsHeapSizeLimit / 100);
+        this.over100 = percent > 100;
+        return this.over100 ? 100 : percent;
+      },
+      formattedSize() {
+        return bytesToSize(this.totalJSHeapSize);
+      },
+      isSupported() {
+        return this.memory;
+      }
+    },
+    mounted() {
+      if (!this.isSupported) {
+        return;
+      }
+      this.intervalId = setInterval(() => {
+        this.memory = performance.memory;
+      }, 1000);
+    },
+    beforeDestroy() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+    }
+  };
+
+  /* script */
+  const __vue_script__$6 = script$6;
+  /* template */
+  var __vue_render__$6 = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _vm.isSupported
+      ? _c(
+          "div",
+          {
+            staticClass: "memory-consuming",
+            style: { width: _vm.percent + "%" },
+            attrs: { title: "Heap size: " + _vm.formattedSize }
+          },
+          [
+            _c("div", {
+              staticClass: "visible",
+              class: { over100: _vm.over100 }
+            }),
+            _c("div", { staticClass: "invisible" })
+          ]
+        )
+      : _vm._e()
+  };
+  var __vue_staticRenderFns__$6 = [];
+  __vue_render__$6._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$6 = undefined;
+    /* scoped */
+    const __vue_scope_id__$6 = "data-v-743f0284";
+    /* module identifier */
+    const __vue_module_identifier__$6 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$6 = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$6 = /*#__PURE__*/normalizeComponent(
+      { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+      __vue_inject_styles__$6,
+      __vue_script__$6,
+      __vue_scope_id__$6,
+      __vue_is_functional_template__$6,
+      __vue_module_identifier__$6,
       false,
       undefined,
       undefined,
@@ -2613,7 +2735,7 @@
 
   //
 
-  var script$6 = {
+  var script$7 = {
     name: "MainContainer",
     data() {
       return {
@@ -2672,14 +2794,15 @@
       FileInputDragNDrop: __vue_component__$3,
       FormattedNumber: __vue_component__$1,
       HasherItem: __vue_component__$2,
-      InputSwitch: __vue_component__$5
+      InputSwitch: __vue_component__$5,
+      MemoryConsuming: __vue_component__$6
     }
   };
 
   /* script */
-  const __vue_script__$6 = script$6;
+  const __vue_script__$7 = script$7;
   /* template */
-  var __vue_render__$6 = function() {
+  var __vue_render__$7 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -2687,6 +2810,7 @@
       "div",
       { staticClass: "main-container-component" },
       [
+        _c("MemoryConsuming"),
         _c("div", { staticClass: "inputs" }, [
           _c(
             "div",
@@ -2766,9 +2890,7 @@
                           )
                         : _vm.binaryLoading
                         ? _c("span", [_vm._v("(loadings...)")])
-                        : _vm.loadingToMemoryTime &&
-                          _vm.storeInMemory &&
-                          _vm.inputBinary !== null
+                        : _vm.loadingToMemoryTime && _vm.storeInMemory
                         ? _c(
                             "span",
                             { attrs: { title: "loaded in" } },
@@ -3004,17 +3126,17 @@
       1
     )
   };
-  var __vue_staticRenderFns__$6 = [];
-  __vue_render__$6._withStripped = true;
+  var __vue_staticRenderFns__$7 = [];
+  __vue_render__$7._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$6 = undefined;
+    const __vue_inject_styles__$7 = undefined;
     /* scoped */
-    const __vue_scope_id__$6 = "data-v-bb62e156";
+    const __vue_scope_id__$7 = "data-v-3f23abd6";
     /* module identifier */
-    const __vue_module_identifier__$6 = undefined;
+    const __vue_module_identifier__$7 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$6 = false;
+    const __vue_is_functional_template__$7 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -3023,13 +3145,13 @@
     
 
     
-    const __vue_component__$6 = /*#__PURE__*/normalizeComponent(
-      { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
-      __vue_inject_styles__$6,
-      __vue_script__$6,
-      __vue_scope_id__$6,
-      __vue_is_functional_template__$6,
-      __vue_module_identifier__$6,
+    const __vue_component__$7 = /*#__PURE__*/normalizeComponent(
+      { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
+      __vue_inject_styles__$7,
+      __vue_script__$7,
+      __vue_scope_id__$7,
+      __vue_is_functional_template__$7,
+      __vue_module_identifier__$7,
       false,
       undefined,
       undefined,
@@ -3038,7 +3160,7 @@
 
   new Vue__default['default']({
       store,
-      render: createElement => createElement(__vue_component__$6),
+      render: createElement => createElement(__vue_component__$7),
   }).$mount("#app");
 
 }(Vue));
