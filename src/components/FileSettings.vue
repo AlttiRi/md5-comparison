@@ -56,7 +56,7 @@ export default {
     ...mapState("input", {
       loadingToMemoryTime: state => state.loadingToMemoryTime,
       binaryLoading: state => state.binaryLoading,
-      error: state => state.fileLoadingError,
+      error: state => state.error,
     }),
 
     ...mapGetters("file-settings", ["readerChunkSize"]),
