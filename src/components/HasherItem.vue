@@ -57,6 +57,9 @@ export default {
   created() {
     bus.$on("input-changed", this.onInputChanged);
   },
+  beforeDestroy() {
+    bus.$off("input-changed", this.onInputChanged);
+  },
   props: ["hasher", "input"],
   methods: {
     onInputChanged() {
