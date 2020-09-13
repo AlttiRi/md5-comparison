@@ -36,11 +36,9 @@ export default {
   textarea {
     width: 100%;
     box-sizing: border-box;
-    display: block;
-    height: 100%;
+    height: calc(100% - 1px); // firefox bug
     border: 0;
     outline: none;
-    min-height: 100px;
     padding: 5px;
     font-size: 17px;
     &:focus::placeholder {

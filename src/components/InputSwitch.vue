@@ -104,9 +104,6 @@ export default {
 
 <style lang="scss" scoped>
 .input-switch-component {
-  padding: 6px;
-  margin-top: 12px;
-  margin-bottom: 24px;
   > * {
     padding: 0 2px;
   }

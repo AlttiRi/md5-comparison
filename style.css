@@ -1,6 +1,8 @@
 html, body {
     min-height: 100vh;
     margin: 0;
+    /*width: 100vw;*/
+    /*overflow-x: hidden;*/
 }
 body {
     display: flex;
@@ -17,9 +19,9 @@ body {
     --drop-active: rgba(0,0,0,0.06);
     --drop-file-over: rgba(0,0,0,0.06);
 
-    --file-input-drag-n-drop-component-border: black;
+    --file-input-drag-n-drop-component-border: rgba(0,0,0,0.6);
+    --textarea-wrapper-border: rgba(0,0,0,0.6);
 
-    --textarea-wrapper-border: rgba(0,0,0,0.5);
     --selected-input-border: rgba(0,0,0,0.5);
     --selected-input-box-shadow: rgba(0,0,0,0.5);
 

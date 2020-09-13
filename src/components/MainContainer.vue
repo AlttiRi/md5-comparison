@@ -2,13 +2,11 @@
 div.main-container-component
   MemoryConsuming
   div.inputs
-    div.text-input-wrapper
-      TextInput(:class="{'selected-input': activeInputType === 'text'}")
-    div.file-group
-      FileInputDragNDrop(
-          :class="{'selected-input': activeInputType === 'file'}"
-          ref="fileInputComponent")
-      FileSettings(:class="{inactive: activeInputType !== 'file'}")
+    TextInput(:class="{'selected-input': activeInputType === 'text'}")
+    FileInputDragNDrop(
+        :class="{'selected-input': activeInputType === 'file'}"
+        ref="fileInputComponent")
+    FileSettings(:class="{inactive: activeInputType !== 'file'}")
   InputSwitch
   div.items
     HasherItem(
@@ -85,10 +83,13 @@ export default {
 
 <style lang="scss" scoped>
 .main-container-component::v-deep .formatted-number-component .number-trio-component > .padded {
-  letter-spacing: 4px;
+  letter-spacing: 3px;
 }
 
 .main-container-component {
+  padding: 10px;
+  box-sizing: border-box;
+
   width: 100%;
   height: 100%;
   display: flex;
@@ -96,71 +97,53 @@ export default {
   align-items: center;
 
   .inputs {
-    margin-top: 12px;
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
+    max-width: calc(930px + 40px);
+    display: grid;
     justify-content: center;
-
-    > * {
-      margin: 4px 0;
-    }
+    grid-template-columns: repeat(auto-fill, 280px);
+    grid-gap: 10px;
+    grid-auto-rows: 1fr;
 
     .selected-input {
       border: solid 1px var(--selected-input-border);
       box-sizing: border-box;
       box-shadow: 0 0 10px var(--selected-input-box-shadow);
     }
+  }
 
-    .text-input-wrapper {
-      display: flex;
-      align-self: stretch;
-      width: 312px;
-    }
-
-    .file-group {
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-
-      > div {
-        width: 312px;
-        min-height: 6em;
-      }
-    }
+  .input-switch-component {
+    padding: 6px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    background-color:    rgba(0,0,0,0.01);
+    box-shadow: 0 0 12px rgba(0,0,0,0.01);
   }
 
   .items {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    width: 100%;
+    display: grid;
     justify-content: center;
-    align-items: center;
+    grid-template-columns: repeat(auto-fill, 280px);
+    grid-gap: 10px;
   }
 
   .interface {
+    margin-top: 12px;
     display: flex;
     justify-content: center;
-    margin: 4px;
   }
 }
 
-/* scrollbar breaks it a bit for 961px - 974px */
-/* todo use grid */
-@media all and (min-width: 640px) and (max-width: 960px) {
-  .main-container-component .inputs .text-input-wrapper {
-    width: 632px;
+@media all and (min-width: 580px) and (max-width: 894px) {
+  .main-container-component .inputs .text-input-component {
+    grid-column: 1 / 3;
   }
 }
 
-@media all and (min-width: 960px) {
-  .main-container-component .inputs > * {
-    margin-left: 4px;
-    margin-right: 4px;
+@media all and (max-width: 579px) {
+  .main-container-component .inputs {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
   }
 }
 </style>

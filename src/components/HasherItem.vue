@@ -216,11 +216,11 @@ export default {
 <style lang="scss" scoped>
 
 .hasher-item-component {
-  width: 310px;
+  //width: 310px;
   height: 200px;
   border: 1px solid dimgray;
-  /*box-sizing: border-box;*/
-  margin: 4px 4px;
+  box-sizing: border-box;
+  //margin: 4px 4px;
 
   display: flex;
   flex-direction: column;
@@ -308,12 +308,4 @@ export default {
   text-shadow: var(--light-blue) 0 0 30px, var(--light-blue) 0 0 1px;
   color: var(--dark-blue);
 }
-
-
-@media all and (min-width: 1280px) {
-  .hasher-item-component {
-    width: 280px;
-  }
-}
-
 </style>

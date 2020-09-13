@@ -96,16 +96,12 @@ export default {
 
 <style lang="scss" scoped>
 .file-settings-component {
-  padding: 6px 4px;
-  box-sizing: border-box;
-  margin: 0 4px;
-
   &.inactive {
     opacity: 0.5;
   }
 
   > * {
-    margin: 6px;
+    margin: 6px 2px;
   }
 
   input[type="number"] {
