@@ -214,98 +214,82 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .hasher-item-component {
-  //width: 310px;
   height: 200px;
   border: 1px solid dimgray;
   box-sizing: border-box;
-  //margin: 4px 4px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
 
-.hasher-item-component .name {
-  padding: 6px 0;
-}
+  > div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-.hasher-item-component > div {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .top {
+    .progress-line {
+      background-color: var(--light-blue);
+      min-height: 4px;
+    }
+    .name {
+      padding: 6px 0;
+    }
+    .compute-buttons {
+      button {
+        user-select: none;
+      }
+    }
+  }
 
+  .middle {
+    height: 100%;
+    position: relative;
+    .hash-times {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      .hash-time {
+        font-size: 18px;
+        text-shadow: var(--light-blue) 0 0 30px, var(--light-blue) 0 0 1px;
+        color: var(--dark-blue);
+        &.computing {
+          opacity: 0.3;
+        }
+      }
+      .file-loading-time {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        padding: 6px 18px;
+        opacity: 0.7;
+      }
+      .total-hash-time {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        padding: 6px 18px;
+        opacity: 0.8;
+      }
+    }
+  }
 
-.hasher-item-component button {
-  user-select: none;
-}
-
-.hasher-item-component .hash {
-  display: flex;
-  justify-content: center;
-  padding-bottom: 4px;
-  padding-top: 4px;
-  border-top: 1px solid darkgrey;
-  width: 100%;
-
-}
-
-.hasher-item-component .progress-line {
-  background-color: var(--light-blue);
-  min-height: 4px;
-}
-
-
-.middle {
-  height: 100%;
-  position: relative;
-}
-
-.hash-times {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-.hash-time {
-  font-size: 18px;
-}
-
-
-.file-loading-time {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  padding: 6px 18px;
-  opacity: 0.7;
-}
-
-.total-hash-time {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  padding: 6px 18px;
-  opacity: 0.8;
-}
-
-.hash {
-  height: 20px;
-}
-
-
-.computing .hash-time {
-  opacity: 0.3;
-}
-
-
-.hash-time {
-  text-shadow: var(--light-blue) 0 0 30px, var(--light-blue) 0 0 1px;
-  color: var(--dark-blue);
+  .bottom {
+    .hash {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 4px;
+      padding-top: 4px;
+      border-top: 1px solid darkgrey;
+      width: 100%;
+      height: 20px;
+    }
+  }
 }
 </style>
