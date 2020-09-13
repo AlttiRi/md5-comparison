@@ -1,114 +1,90 @@
 /* MainContainer.vue */
-.main-container-component[data-v-b277aaf6] .formatted-number .trio > .padded {
-  letter-spacing: 4px;
+.main-container-component[data-v-6d14eadc] .formatted-number-component .number-trio-component > .padded {
+  letter-spacing: 3px;
 }
-.main-container-component[data-v-b277aaf6] {
+.main-container-component[data-v-6d14eadc] {
+  padding: 10px;
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.main-container-component .inputs[data-v-b277aaf6] {
-  margin-top: 12px;
+.main-container-component .inputs[data-v-6d14eadc] {
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
+  max-width: calc(930px + 40px);
+  display: grid;
   justify-content: center;
+  grid-template-columns: repeat(auto-fill, 280px);
+  grid-gap: 10px;
+  grid-auto-rows: 1fr;
 }
-.main-container-component .inputs > *[data-v-b277aaf6] {
-  margin: 4px 0;
-}
-.main-container-component .inputs .selected-input[data-v-b277aaf6] {
+.main-container-component .inputs .selected-input[data-v-6d14eadc] {
   border: solid 1px var(--selected-input-border);
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--selected-input-box-shadow);
 }
-.main-container-component .inputs .text-input-wrapper[data-v-b277aaf6] {
-  display: flex;
-  align-self: stretch;
-  width: 312px;
+@media all and (min-width: 580px) and (max-width: 894px) {
+.main-container-component .inputs .text-input-component[data-v-6d14eadc] {
+    grid-column: 1/3;
 }
-.main-container-component .inputs .file-group[data-v-b277aaf6] {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+}
+@media all and (max-width: 579px) {
+.main-container-component .inputs[data-v-6d14eadc] {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
+}
+}
+.main-container-component .input-switch-component[data-v-6d14eadc] {
+  padding: 6px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  background-color: rgba(0, 0, 0, 0.01);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.01);
+}
+.main-container-component .items[data-v-6d14eadc] {
+  width: 100%;
+  display: grid;
   justify-content: center;
+  grid-template-columns: repeat(auto-fill, 280px);
+  grid-gap: 10px;
 }
-.main-container-component .inputs .file-group > div[data-v-b277aaf6] {
-  width: 312px;
-  min-height: 6em;
-}
-.main-container-component .items[data-v-b277aaf6] {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-.main-container-component .interface[data-v-b277aaf6] {
+.main-container-component .interface[data-v-6d14eadc] {
+  margin-top: 12px;
   display: flex;
   justify-content: center;
-  margin: 4px;
-}
-
-/* scrollbar breaks it a bit for 961px - 974px */
-/* todo use grid */
-@media all and (min-width: 640px) and (max-width: 960px) {
-.main-container-component .inputs .text-input-wrapper[data-v-b277aaf6] {
-    width: 632px;
-}
-}
-@media all and (min-width: 960px) {
-.main-container-component .inputs > *[data-v-b277aaf6] {
-    margin-left: 4px;
-    margin-right: 4px;
-}
 }
 
 /* HasherItem.vue */
-.hasher-item-component[data-v-16ba8718] {
-  width: 310px;
+.hasher-item-component[data-v-8ae0a0ae] {
   height: 200px;
   border: 1px solid dimgray;
-  /*box-sizing: border-box;*/
-  margin: 4px 4px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-.hasher-item-component .name[data-v-16ba8718] {
-  padding: 6px 0;
-}
-.hasher-item-component > div[data-v-16ba8718] {
+.hasher-item-component > div[data-v-8ae0a0ae] {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.hasher-item-component button[data-v-16ba8718] {
-  user-select: none;
-}
-.hasher-item-component .hash[data-v-16ba8718] {
-  display: flex;
-  justify-content: center;
-  padding-bottom: 4px;
-  padding-top: 4px;
-  border-top: 1px solid darkgrey;
-  width: 100%;
-}
-.hasher-item-component .progress-line[data-v-16ba8718] {
+.hasher-item-component .top .progress-line[data-v-8ae0a0ae] {
   background-color: var(--light-blue);
   min-height: 4px;
 }
-.middle[data-v-16ba8718] {
+.hasher-item-component .top .name[data-v-8ae0a0ae] {
+  padding: 6px 0;
+}
+.hasher-item-component .top .compute-buttons button[data-v-8ae0a0ae] {
+  user-select: none;
+}
+.hasher-item-component .middle[data-v-8ae0a0ae] {
   height: 100%;
   position: relative;
 }
-.hash-times[data-v-16ba8718] {
+.hasher-item-component .middle .hash-times[data-v-8ae0a0ae] {
   height: 100%;
   width: 100%;
   display: flex;
@@ -116,59 +92,36 @@
   align-items: center;
   flex-direction: column;
 }
-.hash-time[data-v-16ba8718] {
+.hasher-item-component .middle .hash-times .hash-time[data-v-8ae0a0ae] {
   font-size: 18px;
+  text-shadow: var(--light-blue) 0 0 30px, var(--light-blue) 0 0 1px;
+  color: var(--dark-blue);
 }
-.file-loading-time[data-v-16ba8718] {
+.hasher-item-component .middle .hash-times .hash-time.computing[data-v-8ae0a0ae] {
+  opacity: 0.3;
+}
+.hasher-item-component .middle .hash-times .file-loading-time[data-v-8ae0a0ae] {
   position: absolute;
   left: 0;
   bottom: 0;
   padding: 6px 18px;
   opacity: 0.7;
 }
-.total-hash-time[data-v-16ba8718] {
+.hasher-item-component .middle .hash-times .total-hash-time[data-v-8ae0a0ae] {
   position: absolute;
   right: 0;
   bottom: 0;
   padding: 6px 18px;
   opacity: 0.8;
 }
-.hash[data-v-16ba8718] {
+.hasher-item-component .bottom .hash[data-v-8ae0a0ae] {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  border-top: 1px solid darkgrey;
+  width: 100%;
   height: 20px;
-}
-.computing .hash-time[data-v-16ba8718] {
-  opacity: 0.3;
-}
-.hash-time[data-v-16ba8718] {
-  text-shadow: var(--light-blue) 0 0 30px, var(--light-blue) 0 0 1px;
-  color: var(--dark-blue);
-}
-@media all and (min-width: 1280px) {
-.hasher-item-component[data-v-16ba8718] {
-    width: 280px;
-}
-}
-
-/* TextInput.vue */
-.text-input-component[data-v-553cd546] {
-  border: solid 1px var(--textarea-wrapper-border);
-  box-sizing: border-box;
-  width: 100%;
-}
-.text-input-component textarea[data-v-553cd546] {
-  width: 100%;
-  box-sizing: border-box;
-  display: block;
-  height: 100%;
-  border: 0;
-  outline: none;
-  min-height: 100px;
-  padding: 5px;
-  font-size: 17px;
-}
-.text-input-component textarea[data-v-553cd546]:focus::placeholder {
-  opacity: 0;
-  transition: opacity 0.25s ease;
 }
 
 /* FileInputDragNDrop.vue */
@@ -214,73 +167,83 @@
   font-size: 18px;
 }
 
-/* InputSwitch.vue */
-.input-switch[data-v-5f65b728] {
-  padding: 6px;
-  margin-top: 12px;
-  margin-bottom: 24px;
+/* TextInput.vue */
+.text-input-component[data-v-797af1d4] {
+  border: solid 1px var(--textarea-wrapper-border);
+  box-sizing: border-box;
+  width: 100%;
 }
-.input-switch > *[data-v-5f65b728] {
+.text-input-component textarea[data-v-797af1d4] {
+  width: 100%;
+  box-sizing: border-box;
+  height: calc(100% - 1px);
+  border: 0;
+  outline: none;
+  padding: 5px;
+  font-size: 17px;
+}
+.text-input-component textarea[data-v-797af1d4]:focus::placeholder {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* InputSwitch.vue */
+.input-switch-component > *[data-v-02692d5f] {
   padding: 0 2px;
 }
-.input-switch > div[data-v-5f65b728] {
+.input-switch-component > div[data-v-02692d5f] {
   padding-bottom: 6px;
 }
-.input-switch .input-switch-checkbox[data-v-5f65b728] {
+.input-switch-component .input-switch-checkbox[data-v-02692d5f] {
   opacity: 0;
   transition: opacity 0.4s ease;
 }
-.input-switch .input-switch-checkbox[data-v-5f65b728]:hover {
+.input-switch-component .input-switch-checkbox[data-v-02692d5f]:hover {
   opacity: 1;
   transition: opacity 0.25s ease;
 }
-.red[data-v-5f65b728] {
+.red[data-v-02692d5f] {
   color: var(--red);
 }
 
 /* MemoryConsuming.vue */
-.memory-consuming[data-v-743f0284] {
+.memory-consuming-component[data-v-78c146be] {
   position: absolute;
   left: 0;
   top: 0;
 }
-.memory-consuming > div[data-v-743f0284] {
+.memory-consuming-component > div[data-v-78c146be] {
   width: 100%;
 }
-.memory-consuming .visible[data-v-743f0284] {
+.memory-consuming-component .visible[data-v-78c146be] {
   background-color: #415aff;
   height: 2px;
 }
-.memory-consuming .visible.over100[data-v-743f0284] {
+.memory-consuming-component .visible.over100[data-v-78c146be] {
   background-color: #e30000;
 }
-.memory-consuming .invisible[data-v-743f0284] {
+.memory-consuming-component .invisible[data-v-78c146be] {
   height: 3px;
 }
 
 /* FileSettings.vue */
-.file-settings[data-v-60ea9f4e] {
-  padding: 6px 4px;
-  box-sizing: border-box;
-  margin: 0 4px;
-}
-.file-settings.inactive[data-v-60ea9f4e] {
+.file-settings-component.inactive[data-v-36e5e740] {
   opacity: 0.5;
 }
-.file-settings > *[data-v-60ea9f4e] {
-  margin: 6px;
+.file-settings-component > *[data-v-36e5e740] {
+  margin: 6px 2px;
 }
-.file-settings input[type=number][data-v-60ea9f4e] {
+.file-settings-component input[type=number][data-v-36e5e740] {
   max-width: 42px;
   margin-left: 4px;
   margin-top: 4px;
 }
-.file-settings input[type=number].invalid[data-v-60ea9f4e] {
+.file-settings-component input[type=number].invalid[data-v-36e5e740] {
   border: 2px solid var(--red);
   outline: none;
   box-shadow: 0 0 1px 0 var(--red);
 }
-.red[data-v-60ea9f4e] {
+.red[data-v-36e5e740] {
   color: var(--red);
 }
 

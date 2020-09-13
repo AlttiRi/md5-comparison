@@ -449,7 +449,7 @@
       var _vm = this;
       var _h = _vm.$createElement;
       var _c = _vm._self._c || _h;
-      return _c("span", { staticClass: "trio" }, [
+      return _c("span", { staticClass: "number-trio-component" }, [
         _vm.part1 ? _c("span", [_vm._v(_vm._s(_vm.part1))]) : _vm._e(),
         _vm.part2
           ? _c(
@@ -569,7 +569,7 @@
       var _vm = this;
       var _h = _vm.$createElement;
       var _c = _vm._self._c || _h;
-      return _c("span", { staticClass: "formatted-number" }, [
+      return _c("span", { staticClass: "formatted-number-component" }, [
         _vm.isNegative
           ? _c("span", { staticClass: "minus" }, [_vm._v("-")])
           : _vm._e(),
@@ -944,7 +944,7 @@
       /* style */
       const __vue_inject_styles__$2 = undefined;
       /* scoped */
-      const __vue_scope_id__$2 = "data-v-16ba8718";
+      const __vue_scope_id__$2 = "data-v-8ae0a0ae";
       /* module identifier */
       const __vue_module_identifier__$2 = undefined;
       /* functional template */
@@ -1183,7 +1183,7 @@
       /* style */
       const __vue_inject_styles__$4 = undefined;
       /* scoped */
-      const __vue_scope_id__$4 = "data-v-553cd546";
+      const __vue_scope_id__$4 = "data-v-797af1d4";
       /* module identifier */
       const __vue_module_identifier__$4 = undefined;
       /* functional template */
@@ -1290,7 +1290,7 @@
       var _vm = this;
       var _h = _vm.$createElement;
       var _c = _vm._self._c || _h;
-      return _c("div", { staticClass: "input-switch" }, [
+      return _c("div", { staticClass: "input-switch-component" }, [
         _c("div", { staticClass: "switch-line" }, [
           _vm._v("Input:"),
           _c("label", [
@@ -1406,7 +1406,7 @@
       /* style */
       const __vue_inject_styles__$5 = undefined;
       /* scoped */
-      const __vue_scope_id__$5 = "data-v-5f65b728";
+      const __vue_scope_id__$5 = "data-v-02692d5f";
       /* module identifier */
       const __vue_module_identifier__$5 = undefined;
       /* functional template */
@@ -1485,7 +1485,7 @@
         ? _c(
             "div",
             {
-              staticClass: "memory-consuming",
+              staticClass: "memory-consuming-component",
               style: { width: _vm.percent + "%" },
               attrs: { title: "Heap size: " + _vm.formattedSize }
             },
@@ -1505,7 +1505,7 @@
       /* style */
       const __vue_inject_styles__$6 = undefined;
       /* scoped */
-      const __vue_scope_id__$6 = "data-v-743f0284";
+      const __vue_scope_id__$6 = "data-v-78c146be";
       /* module identifier */
       const __vue_module_identifier__$6 = undefined;
       /* functional template */
@@ -1583,7 +1583,7 @@
       var _vm = this;
       var _h = _vm.$createElement;
       var _c = _vm._self._c || _h;
-      return _c("div", { staticClass: "file-settings" }, [
+      return _c("div", { staticClass: "file-settings-component" }, [
         _c("div", { staticClass: "store-in-memory" }, [
           _c("label", [
             _c("input", {
@@ -1824,7 +1824,7 @@
       /* style */
       const __vue_inject_styles__$7 = undefined;
       /* scoped */
-      const __vue_scope_id__$7 = "data-v-60ea9f4e";
+      const __vue_scope_id__$7 = "data-v-36e5e740";
       /* module identifier */
       const __vue_module_identifier__$7 = undefined;
       /* functional template */
@@ -2091,32 +2091,23 @@
         { staticClass: "main-container-component" },
         [
           _c("MemoryConsuming"),
-          _c("div", { staticClass: "inputs" }, [
-            _c(
-              "div",
-              { staticClass: "text-input-wrapper" },
-              [
-                _c("TextInput", {
-                  class: { "selected-input": _vm.activeInputType === "text" }
-                })
-              ],
-              1
-            ),
-            _c(
-              "div",
-              { staticClass: "file-group" },
-              [
-                _c("FileInputDragNDrop", {
-                  ref: "fileInputComponent",
-                  class: { "selected-input": _vm.activeInputType === "file" }
-                }),
-                _c("FileSettings", {
-                  class: { inactive: _vm.activeInputType !== "file" }
-                })
-              ],
-              1
-            )
-          ]),
+          _c(
+            "div",
+            { staticClass: "inputs" },
+            [
+              _c("TextInput", {
+                class: { "selected-input": _vm.activeInputType === "text" }
+              }),
+              _c("FileInputDragNDrop", {
+                ref: "fileInputComponent",
+                class: { "selected-input": _vm.activeInputType === "file" }
+              }),
+              _c("FileSettings", {
+                class: { inactive: _vm.activeInputType !== "file" }
+              })
+            ],
+            1
+          ),
           _c("InputSwitch"),
           _c(
             "div",
@@ -2144,7 +2135,7 @@
       /* style */
       const __vue_inject_styles__$8 = undefined;
       /* scoped */
-      const __vue_scope_id__$8 = "data-v-b277aaf6";
+      const __vue_scope_id__$8 = "data-v-6d14eadc";
       /* module identifier */
       const __vue_module_identifier__$8 = undefined;
       /* functional template */
