@@ -110,6 +110,16 @@ export default {
       box-sizing: border-box;
       box-shadow: 0 0 10px var(--selected-input-box-shadow);
     }
+
+    .text-input-component {
+      @media all and (min-width: 580px) and (max-width: 894px) {
+        grid-column: 1 / 3;
+      }
+    }
+
+    @media all and (max-width: 579px) {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
+    }
   }
 
   .input-switch-component {
@@ -132,18 +142,6 @@ export default {
     margin-top: 12px;
     display: flex;
     justify-content: center;
-  }
-}
-
-@media all and (min-width: 580px) and (max-width: 894px) {
-  .main-container-component .inputs .text-input-component {
-    grid-column: 1 / 3;
-  }
-}
-
-@media all and (max-width: 579px) {
-  .main-container-component .inputs {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
   }
 }
 </style>
