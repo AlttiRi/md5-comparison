@@ -1,5 +1,5 @@
 <template lang="pug">
-span.trio
+span.number-trio-component
   span(v-if="part1") {{part1}}
   span.padded(v-if="part2" :style="{letterSpacing: padding}") {{part2}}
 </template>

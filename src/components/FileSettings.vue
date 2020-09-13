@@ -1,5 +1,5 @@
 <template lang="pug">
-div.file-settings
+div.file-settings-component
   div.store-in-memory
     label
       input(type="checkbox" v-model="storeInMemory")
@@ -95,7 +95,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.file-settings {
+.file-settings-component {
   padding: 6px 4px;
   box-sizing: border-box;
   margin: 0 4px;

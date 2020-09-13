@@ -1,5 +1,5 @@
 <template lang="pug">
-div.input-switch
+div.input-switch-component
   div.switch-line
     | Input:
     label
@@ -103,7 +103,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.input-switch {
+.input-switch-component {
   padding: 6px;
   margin-top: 12px;
   margin-bottom: 24px;

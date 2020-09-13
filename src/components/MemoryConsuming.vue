@@ -1,5 +1,5 @@
 <template lang="pug">
-div.memory-consuming(
+div.memory-consuming-component(
     v-if="isSupported"
     :style="{width: percent + '%'}"
     :title="'Heap size: ' + formattedSize")
@@ -52,7 +52,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.memory-consuming {
+.memory-consuming-component {
   position: absolute;
   left: 0;
   top: 0;

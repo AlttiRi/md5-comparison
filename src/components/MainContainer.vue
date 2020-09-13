@@ -84,7 +84,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.main-container-component::v-deep .formatted-number .trio > .padded {
+.main-container-component::v-deep .formatted-number-component .number-trio-component > .padded {
   letter-spacing: 4px;
 }
 

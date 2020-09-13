@@ -9,7 +9,7 @@
   }
  -->
 <template lang="pug">
-span.formatted-number
+span.formatted-number-component
   span.minus(v-if="isNegative") -
   span.integer
     NumberTrio(
