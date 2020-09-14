@@ -12,7 +12,7 @@ const input = `../src/${filename}.js`;
 export const inputOptions = {
     input,
     plugins: [
-        css(getVueStylesWriter("style.css", dist)),
+        css(getVueStylesWriter("components.css", dist)),
         vue({
             css: false,
             needMap: true,
