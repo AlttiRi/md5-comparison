@@ -12,7 +12,7 @@ div.main-container-component
     HasherItem(
         v-for="(hasher, index) of hashers"
         :hasher="hasher"
-        :key="index"
+        :key="hasher.id"
         :input="input"
         ref="items")
   div.interface

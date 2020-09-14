@@ -66,6 +66,10 @@ export default {
       this.newInput = true;
     },
     async compute() {
+      if (!this.hasher.initialised) {
+        await this.hasher.init();
+      }
+
       this.computing = true;
       this.time = 0;
       this.progress = 0;
@@ -100,6 +104,10 @@ export default {
       this.computing = false;
     },
     async streamCompute() {
+      if (!this.hasher.initialised) {
+        await this.hasher.init();
+      }
+
       this.computing = true;
       this.progress = 0;
       await new Promise(resolve => setTimeout(resolve, 16));

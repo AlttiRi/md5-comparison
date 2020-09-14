@@ -1,5 +1,14 @@
 import {isString, isArrayBuffer} from "./util.js";
 
+function appendScript(src) {
+    return new Promise(resolve => {
+        const script = document.createElement("script");
+        script.onload = resolve;
+        script.src = src;
+        document.querySelector("head").append(script);
+    });
+}
+
 /**
  * A normalised hasher
  * @abstract
@@ -7,6 +16,17 @@ import {isString, isArrayBuffer} from "./util.js";
 class Hasher {
     static binarySupported = true;
     static updateSupported = true;
+    static githubName = null;
+    static scriptName = null;
+    static initialised = false;
+    static get id() {
+        return this.githubName;
+    }
+    static async init(min = true) {
+        const scriptSrc = "./dist/vendor/" + this.scriptName + (min ? ".min" : "") + ".js";
+        await appendScript(scriptSrc);
+        this.initialised = true;
+    }
 }
 
 //todo
@@ -24,6 +44,7 @@ class Hasher {
 
 class HasherBlueimp extends Hasher {
     static githubName = "blueimp/JavaScript-MD5";
+    static scriptName = "blueimp-md5.rolluped";
     static binarySupported = false;
     static updateSupported = false;
     static hash(data) {
@@ -36,6 +57,7 @@ class HasherBlueimp extends Hasher {
 
 class HasherCryptoJS extends Hasher {
     static githubName = "brix/crypto-js";
+    static scriptName = "cryptojs-md5.rolluped";
     constructor() {
         super();
         this.hasher = CryptoJS.algo.MD5.create();
@@ -69,6 +91,7 @@ class HasherCryptoJS extends Hasher {
 
 class HasherCbMD5 extends Hasher {
     static githubName = "crypto-browserify/md5.js";
+    static scriptName = "cb-md5.browserified";
     constructor() {
         super();
         this.hasher = new CbMD5();
@@ -101,6 +124,7 @@ class HasherCbMD5 extends Hasher {
 
 class HasherJsMD5 extends Hasher {
     static githubName = "emn178/js-md5";
+    static scriptName = "js-md5.rolluped";
     constructor() {
         super();
         this.hasher = JsMD5.create();
@@ -122,6 +146,7 @@ class HasherJsMD5 extends Hasher {
 
 class HasherNodeMD5 extends Hasher {
     static githubName = "pvorb/node-md5";
+    static scriptName = "node-md5.browserified";
     static updateSupported = false;
     static _consumize(data) {
         if (isString(data)) {
@@ -140,6 +165,7 @@ class HasherNodeMD5 extends Hasher {
 
 class HasherSparkMD5 extends Hasher {
     static githubName = "satazor/js-spark-md5";
+    static scriptName = "spark-md5.rolluped";
     constructor() {
         super();
         this.hasher = new SparkMD5.ArrayBuffer();
@@ -178,6 +204,17 @@ Object.assign(MD5, {
     Node: HasherNodeMD5,
     Spark: HasherSparkMD5,
 });
-Object.defineProperty(MD5, "list", { get: function() { return Object.values(this); } });
 
-export default MD5; // globalThis.MD5 = MD5;
+Object.defineProperty(MD5, "list", {
+    get: function() {
+        return Object.values(this);
+    }
+});
+Object.defineProperty(MD5, "byId", {
+    value: function(id) {
+        return Object.values(this).find(el => el.id === id);
+    }
+});
+globalThis.MD5 = MD5;
+
+export default MD5;
