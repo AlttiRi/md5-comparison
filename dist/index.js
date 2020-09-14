@@ -639,12 +639,19 @@
       created() {
         bus.$on("input-changed", this.onInputChanged);
       },
+      beforeDestroy() {
+        bus.$off("input-changed", this.onInputChanged);
+      },
       props: ["hasher", "input"],
       methods: {
         onInputChanged() {
           this.newInput = true;
         },
         async compute() {
+          if (!this.hasher.initialised) {
+            await this.hasher.init();
+          }
+
           this.computing = true;
           this.time = 0;
           this.progress = 0;
@@ -679,6 +686,10 @@
           this.computing = false;
         },
         async streamCompute() {
+          if (!this.hasher.initialised) {
+            await this.hasher.init();
+          }
+
           this.computing = true;
           this.progress = 0;
           await new Promise(resolve => setTimeout(resolve, 16));
@@ -944,7 +955,7 @@
       /* style */
       const __vue_inject_styles__$2 = undefined;
       /* scoped */
-      const __vue_scope_id__$2 = "data-v-8ae0a0ae";
+      const __vue_scope_id__$2 = "data-v-73979510";
       /* module identifier */
       const __vue_module_identifier__$2 = undefined;
       /* functional template */
@@ -1850,6 +1861,15 @@
         undefined
       );
 
+    function appendScript(src) {
+        return new Promise(resolve => {
+            const script = document.createElement("script");
+            script.onload = resolve;
+            script.src = src;
+            document.querySelector("head").append(script);
+        });
+    }
+
     /**
      * A normalised hasher
      * @abstract
@@ -1857,6 +1877,17 @@
     class Hasher {
         static binarySupported = true;
         static updateSupported = true;
+        static githubName = null;
+        static scriptName = null;
+        static initialised = false;
+        static get id() {
+            return this.githubName;
+        }
+        static async init(min = true) {
+            const scriptSrc = "./dist/vendor/" + this.scriptName + (min ? ".min" : "") + ".js";
+            await appendScript(scriptSrc);
+            this.initialised = true;
+        }
     }
 
     //todo
@@ -1874,6 +1905,7 @@
 
     class HasherBlueimp extends Hasher {
         static githubName = "blueimp/JavaScript-MD5";
+        static scriptName = "blueimp-md5.rolluped";
         static binarySupported = false;
         static updateSupported = false;
         static hash(data) {
@@ -1886,6 +1918,7 @@
 
     class HasherCryptoJS extends Hasher {
         static githubName = "brix/crypto-js";
+        static scriptName = "cryptojs-md5.rolluped";
         constructor() {
             super();
             this.hasher = CryptoJS.algo.MD5.create();
@@ -1919,6 +1952,7 @@
 
     class HasherCbMD5 extends Hasher {
         static githubName = "crypto-browserify/md5.js";
+        static scriptName = "cb-md5.browserified";
         constructor() {
             super();
             this.hasher = new CbMD5();
@@ -1951,6 +1985,7 @@
 
     class HasherJsMD5 extends Hasher {
         static githubName = "emn178/js-md5";
+        static scriptName = "js-md5.rolluped";
         constructor() {
             super();
             this.hasher = JsMD5.create();
@@ -1972,6 +2007,7 @@
 
     class HasherNodeMD5 extends Hasher {
         static githubName = "pvorb/node-md5";
+        static scriptName = "node-md5.browserified";
         static updateSupported = false;
         static _consumize(data) {
             if (isString(data)) {
@@ -1990,6 +2026,7 @@
 
     class HasherSparkMD5 extends Hasher {
         static githubName = "satazor/js-spark-md5";
+        static scriptName = "spark-md5.rolluped";
         constructor() {
             super();
             this.hasher = new SparkMD5.ArrayBuffer();
@@ -2028,8 +2065,18 @@
         Node: HasherNodeMD5,
         Spark: HasherSparkMD5,
     });
-    Object.defineProperty(MD5, "list", { get: function() { return Object.values(this); } });
-     // globalThis.MD5 = MD5;
+
+    Object.defineProperty(MD5, "list", {
+        get: function() {
+            return Object.values(this);
+        }
+    });
+    Object.defineProperty(MD5, "byId", {
+        value: function(id) {
+            return Object.values(this).find(el => el.id === id);
+        }
+    });
+    globalThis.MD5 = MD5;
 
     //
 
@@ -2114,7 +2161,7 @@
             { staticClass: "items" },
             _vm._l(_vm.hashers, function(hasher, index) {
               return _c("HasherItem", {
-                key: index,
+                key: hasher.id,
                 ref: "items",
                 refInFor: true,
                 attrs: { hasher: hasher, input: _vm.input }
@@ -2135,7 +2182,7 @@
       /* style */
       const __vue_inject_styles__$8 = undefined;
       /* scoped */
-      const __vue_scope_id__$8 = "data-v-6d14eadc";
+      const __vue_scope_id__$8 = "data-v-70474b80";
       /* module identifier */
       const __vue_module_identifier__$8 = undefined;
       /* functional template */

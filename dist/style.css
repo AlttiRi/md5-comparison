@@ -1,8 +1,8 @@
 /* MainContainer.vue */
-.main-container-component[data-v-6d14eadc] .formatted-number-component .number-trio-component > .padded {
+.main-container-component[data-v-70474b80] .formatted-number-component .number-trio-component > .padded {
   letter-spacing: 3px;
 }
-.main-container-component[data-v-6d14eadc] {
+.main-container-component[data-v-70474b80] {
   padding: 10px;
   box-sizing: border-box;
   width: 100%;
@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: center;
 }
-.main-container-component .inputs[data-v-6d14eadc] {
+.main-container-component .inputs[data-v-70474b80] {
   width: 100%;
   max-width: calc(930px + 40px);
   display: grid;
@@ -20,43 +20,43 @@
   grid-gap: 10px;
   grid-auto-rows: 1fr;
 }
-.main-container-component .inputs .selected-input[data-v-6d14eadc] {
+.main-container-component .inputs .selected-input[data-v-70474b80] {
   border: solid 1px var(--selected-input-border);
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--selected-input-box-shadow);
 }
 @media all and (min-width: 580px) and (max-width: 894px) {
-.main-container-component .inputs .text-input-component[data-v-6d14eadc] {
+.main-container-component .inputs .text-input-component[data-v-70474b80] {
     grid-column: 1/3;
 }
 }
 @media all and (max-width: 579px) {
-.main-container-component .inputs[data-v-6d14eadc] {
+.main-container-component .inputs[data-v-70474b80] {
     grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
 }
 }
-.main-container-component .input-switch-component[data-v-6d14eadc] {
+.main-container-component .input-switch-component[data-v-70474b80] {
   padding: 6px;
   margin-top: 12px;
   margin-bottom: 12px;
   background-color: rgba(0, 0, 0, 0.01);
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.01);
 }
-.main-container-component .items[data-v-6d14eadc] {
+.main-container-component .items[data-v-70474b80] {
   width: 100%;
   display: grid;
   justify-content: center;
   grid-template-columns: repeat(auto-fill, 280px);
   grid-gap: 10px;
 }
-.main-container-component .interface[data-v-6d14eadc] {
+.main-container-component .interface[data-v-70474b80] {
   margin-top: 12px;
   display: flex;
   justify-content: center;
 }
 
 /* HasherItem.vue */
-.hasher-item-component[data-v-8ae0a0ae] {
+.hasher-item-component[data-v-73979510] {
   height: 200px;
   border: 1px solid dimgray;
   box-sizing: border-box;
@@ -64,27 +64,27 @@
   flex-direction: column;
   justify-content: space-between;
 }
-.hasher-item-component > div[data-v-8ae0a0ae] {
+.hasher-item-component > div[data-v-73979510] {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.hasher-item-component .top .progress-line[data-v-8ae0a0ae] {
+.hasher-item-component .top .progress-line[data-v-73979510] {
   background-color: var(--light-blue);
   min-height: 4px;
 }
-.hasher-item-component .top .name[data-v-8ae0a0ae] {
+.hasher-item-component .top .name[data-v-73979510] {
   padding: 6px 0;
 }
-.hasher-item-component .top .compute-buttons button[data-v-8ae0a0ae] {
+.hasher-item-component .top .compute-buttons button[data-v-73979510] {
   user-select: none;
 }
-.hasher-item-component .middle[data-v-8ae0a0ae] {
+.hasher-item-component .middle[data-v-73979510] {
   height: 100%;
   position: relative;
 }
-.hasher-item-component .middle .hash-times[data-v-8ae0a0ae] {
+.hasher-item-component .middle .hash-times[data-v-73979510] {
   height: 100%;
   width: 100%;
   display: flex;
@@ -92,29 +92,29 @@
   align-items: center;
   flex-direction: column;
 }
-.hasher-item-component .middle .hash-times .hash-time[data-v-8ae0a0ae] {
+.hasher-item-component .middle .hash-times .hash-time[data-v-73979510] {
   font-size: 18px;
   text-shadow: var(--light-blue) 0 0 30px, var(--light-blue) 0 0 1px;
   color: var(--dark-blue);
 }
-.hasher-item-component .middle .hash-times .hash-time.computing[data-v-8ae0a0ae] {
+.hasher-item-component .middle .hash-times .hash-time.computing[data-v-73979510] {
   opacity: 0.3;
 }
-.hasher-item-component .middle .hash-times .file-loading-time[data-v-8ae0a0ae] {
+.hasher-item-component .middle .hash-times .file-loading-time[data-v-73979510] {
   position: absolute;
   left: 0;
   bottom: 0;
   padding: 6px 18px;
   opacity: 0.7;
 }
-.hasher-item-component .middle .hash-times .total-hash-time[data-v-8ae0a0ae] {
+.hasher-item-component .middle .hash-times .total-hash-time[data-v-73979510] {
   position: absolute;
   right: 0;
   bottom: 0;
   padding: 6px 18px;
   opacity: 0.8;
 }
-.hasher-item-component .bottom .hash[data-v-8ae0a0ae] {
+.hasher-item-component .bottom .hash[data-v-73979510] {
   display: flex;
   justify-content: center;
   padding-bottom: 4px;
