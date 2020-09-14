@@ -1,4 +1,5 @@
 import {build, minify, sourceMappingURL, write} from "./common.js";
+import {dist as _dist} from "./settings.js";
 import {appendFinally} from "./rollup-plugins.js";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
@@ -28,7 +29,7 @@ const outputOptions = {
 !async function main() {
     const promises = [];
 
-    const dist = "../dist/vendor/";
+    const dist = _dist + "./vendor/";
     const hashers = ["js-md5", "spark-md5", "blueimp-md5", "cryptojs-md5"];
 
     for (const hasher of hashers) {

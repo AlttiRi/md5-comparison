@@ -4,7 +4,7 @@ import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 import {sourceMappingURL, getVueStylesWriter} from "./common.js";
 
-export const dist = "../dist/";
+export const dist = "../static/dist/";
 export const filename = "index";
 const input = `../src/${filename}.js`;
 

@@ -11,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "watch:vue": "cd building && node watch.js",
-    "live-server": "live-server --watch=\"dist,index.html,style.css,vendor\"",
+    "live-server": "cd static && live-server",
     "build": "npm run build:vue && npm run build:libs",
     "build:vue": "cd building && node bundle.js",
     "build:libs": "cd building && node bundle-libs.js"
