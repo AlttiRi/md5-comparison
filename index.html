@@ -8,9 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="style.css"/>
-    <!-- From components -->
-    <link rel="stylesheet" href="dist/style.css"/>
-
+    <link rel="stylesheet" href="dist/components.css"/>
 </head>
 <body>
 
@@ -30,7 +28,7 @@
     const _min = min !== null ? min : !_dev;
 
     Promise.all([
-        appendScript(`md5-provider.js`),
+        appendScript(`md5.js`),
         appendScript(`https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime${_dev ? "" : ".min"}.js`),
         appendScript(`https://cdn.jsdelivr.net/npm/vuex/dist/vuex${_dev ? "" : ".min"}.js`)
     ]).then(_ => appendScript(`./dist/index${_min ? ".min" : ""}.js`));
