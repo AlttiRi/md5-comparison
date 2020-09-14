@@ -1,8 +1,8 @@
 /* MainContainer.vue */
-.main-container-component[data-v-70474b80] .formatted-number-component .number-trio-component > .padded {
+.main-container-component[data-v-00d7faac] .formatted-number-component .number-trio-component > .padded {
   letter-spacing: 3px;
 }
-.main-container-component[data-v-70474b80] {
+.main-container-component[data-v-00d7faac] {
   padding: 10px;
   box-sizing: border-box;
   width: 100%;
@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: center;
 }
-.main-container-component .inputs[data-v-70474b80] {
+.main-container-component .inputs[data-v-00d7faac] {
   width: 100%;
   max-width: calc(930px + 40px);
   display: grid;
@@ -20,36 +20,36 @@
   grid-gap: 10px;
   grid-auto-rows: 1fr;
 }
-.main-container-component .inputs .selected-input[data-v-70474b80] {
+.main-container-component .inputs .selected-input[data-v-00d7faac] {
   border: solid 1px var(--selected-input-border);
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--selected-input-box-shadow);
 }
 @media all and (min-width: 580px) and (max-width: 894px) {
-.main-container-component .inputs .text-input-component[data-v-70474b80] {
+.main-container-component .inputs .text-input-component[data-v-00d7faac] {
     grid-column: 1/3;
 }
 }
 @media all and (max-width: 579px) {
-.main-container-component .inputs[data-v-70474b80] {
+.main-container-component .inputs[data-v-00d7faac] {
     grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
 }
 }
-.main-container-component .input-switch-component[data-v-70474b80] {
+.main-container-component .input-switch-component[data-v-00d7faac] {
   padding: 6px;
   margin-top: 12px;
   margin-bottom: 12px;
   background-color: rgba(0, 0, 0, 0.01);
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.01);
 }
-.main-container-component .items[data-v-70474b80] {
+.main-container-component .items[data-v-00d7faac] {
   width: 100%;
   display: grid;
   justify-content: center;
   grid-template-columns: repeat(auto-fill, 280px);
   grid-gap: 10px;
 }
-.main-container-component .interface[data-v-70474b80] {
+.main-container-component .interface[data-v-00d7faac] {
   margin-top: 12px;
   display: flex;
   justify-content: center;
