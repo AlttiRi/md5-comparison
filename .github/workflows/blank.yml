@@ -49,6 +49,7 @@ jobs:
           git status;
       - name: Move static and generated files && and check files
         run: cp -r ./dist/ ./$folder_name/ &&
+          mkdir ./$folder_name/vendor/ &&
           cp -r ./vendor/md5-provider.js ./$folder_name/vendor/md5-provider.js &&
           cp index.html $folder_name/index.html &&
           cp style.css $folder_name/style.css &&
