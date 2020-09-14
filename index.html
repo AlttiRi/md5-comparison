@@ -30,6 +30,7 @@
     const _min = min !== null ? min : !_dev;
 
     Promise.all([
+        appendScript(`vendor/md5-provider.js`),
         appendScript(`https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime${_dev ? "" : ".min"}.js`),
         appendScript(`https://cdn.jsdelivr.net/npm/vuex/dist/vuex${_dev ? "" : ".min"}.js`)
     ]).then(_ => appendScript(`./dist/index${_min ? ".min" : ""}.js`));

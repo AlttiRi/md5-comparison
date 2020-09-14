@@ -1,14 +1,3 @@
-import {isString, isArrayBuffer} from "./util.js";
-
-function appendScript(src) {
-    return new Promise(resolve => {
-        const script = document.createElement("script");
-        script.onload = resolve;
-        script.src = src;
-        document.querySelector("head").append(script);
-    });
-}
-
 /**
  * A normalised hasher
  * @abstract
@@ -217,4 +206,18 @@ Object.defineProperty(MD5, "byId", {
 });
 globalThis.MD5 = MD5;
 
-export default MD5;
+// === Util === //
+function isArrayBuffer(data) {
+    return data instanceof ArrayBuffer;
+}
+function isString(data) {
+    return typeof data === "string" || data instanceof String;
+}
+function appendScript(src) {
+    return new Promise(resolve => {
+        const script = document.createElement("script");
+        script.onload = resolve;
+        script.src = src;
+        document.querySelector("head").append(script);
+    });
+}

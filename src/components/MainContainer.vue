@@ -3,9 +3,7 @@ div.main-container-component
   MemoryConsuming
   div.inputs
     TextInput(:class="{'selected-input': activeInputType === 'text'}")
-    FileInputDragNDrop(
-        :class="{'selected-input': activeInputType === 'file'}"
-        ref="fileInputComponent")
+    FileInputDragNDrop(:class="{'selected-input': activeInputType === 'file'}")
     FileSettings(:class="{inactive: activeInputType !== 'file'}")
   InputSwitch
   div.items
@@ -29,16 +27,15 @@ import FormattedNumber from "./FormattedNumber.vue";
 import MemoryConsuming from "./MemoryConsuming.vue";
 import FileSettings from "./FileSettings.vue";
 
+import {mapState} from "vuex";
 import {bus} from "./bus.js";
 import * as Util from "../util.js";
-import MD5 from "../md5-provider.js";
-import {mapState} from "vuex";
 
 export default {
   name: "MainContainer",
   data() {
     return {
-      hashers: MD5.list
+      hashers: globalThis.MD5.list
     }
   },
   computed: {
