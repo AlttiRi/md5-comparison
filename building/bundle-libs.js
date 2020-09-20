@@ -27,6 +27,7 @@ const outputOptions = {
 
 
 !async function main() {
+    console.time("build-libs");
     const promises = [];
 
     const dist = _dist + "./vendor/";
@@ -37,8 +38,8 @@ const outputOptions = {
         const filename = `${hasher}.rolluped`;
 
         console.log(`[${hasher}]`);
-        const done = await build(getInputOptions(input, filename), outputOptions, filename, dist);
-        promises.push(done);
+        const built = build(getInputOptions(input, filename), outputOptions, filename, dist);
+        promises.push(built);
     }
 
     const hashers2 = ["cb-md5", "node-md5"];
@@ -67,4 +68,5 @@ const outputOptions = {
     }
 
     await Promise.all(promises);
+    console.timeEnd("build-libs");
 }();

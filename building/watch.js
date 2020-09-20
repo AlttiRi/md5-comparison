@@ -1,6 +1,6 @@
 import {watch} from "rollup";
 import {write} from "./common.js";
-import {bundle} from "./bundle.js";
+import {bundleVue} from "./bundles.js";
 import {inputOptions, outputOptions, dist} from "./settings.js";
 
 const watchOptions = {
@@ -26,7 +26,7 @@ watcher.on("event", async event => {
             return;
         }
         console.time("rebuilt [" + i + "]");
-        await bundle(true);
+        await bundleVue(true);
         console.timeEnd("rebuilt [" + i + "]");
     }
 });

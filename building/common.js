@@ -16,7 +16,6 @@ export async function build(inputOptions, outputOptions, filename, dist, skipMin
         promises.push(writtenMin);
     }
 
-
     return Promise.all(promises);
 }
 
