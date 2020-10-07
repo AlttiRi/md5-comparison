@@ -1,5 +1,9 @@
 <template lang="pug">
 div.file-settings-component
+  div.use-worker
+    label
+      input(type="checkbox" v-model="useWorker")
+      | Use web worker
   div.store-in-memory
     label
       input(type="checkbox" v-model="storeInMemory")
@@ -79,6 +83,10 @@ export default {
     fps: {
       get() { return this.$store.state["file-settings"].fps; },
       set(value) { this.$store.commit("file-settings/fps", value); }
+    },
+    useWorker: {
+      get() { return this.$store.state["file-settings"].useWorker; },
+      set(value) { this.$store.commit("file-settings/useWorker", value); }
     }
   },
   watch: {

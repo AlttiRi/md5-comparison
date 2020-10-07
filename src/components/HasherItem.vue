@@ -67,14 +67,13 @@ export default {
     },
     async compute() {
       if (!this.hasher.initialised) {
-        await this.hasher.init();
+        await this.hasher.init(); // if worker?
       }
 
       this.computing = true;
       this.time = 0;
       this.progress = 0;
-      this.$forceUpdate();
-      await new Promise(resolve => setTimeout(resolve, 16));
+      await this.forceUpdate();
 
       let input;
       if (Util.isString(this.input)) {
@@ -91,14 +90,14 @@ export default {
           input = this.input;
           this.loadingToMemoryTime = this._loadingToMemoryTime;
         }
-        this.$forceUpdate();
-        await new Promise(resolve => setTimeout(resolve, 16));
+        await this.forceUpdate();
       }
 
+      const useWorker = this.useWorker && !this.inputIsString;
       const start = performance.now();
-      this.hash = this.hasher.hash(input);
-      this.progress = 100;
+      this.hash = await this.hasher.hash(input, useWorker);
       this.time = performance.now() - start;
+      this.progress = 100;
       this.newInput = false;
 
       this.computing = false;
@@ -110,7 +109,7 @@ export default {
 
       this.computing = true;
       this.progress = 0;
-      await new Promise(resolve => setTimeout(resolve, 16));
+      await this.forceUpdate();
 
       const self = this;
       this.loadingToMemoryTime = null;
@@ -127,7 +126,7 @@ export default {
       this.computing = false;
 
       async function _hashIterable(iterable, length) {
-        const hasher = new self.hasher();
+        const hasher = self.hasher.getInstance();
         const start = performance.now();
         let curTime = start;
         let totalRead = 0;
@@ -150,7 +149,11 @@ export default {
         self.hash = hasher.finalize();
         self.time = performance.now() - start;
       }
-    }
+    },
+    async forceUpdate() {
+      this.$forceUpdate();
+      await new Promise(resolve => setTimeout(resolve, 16));
+    },
   },
   data() {
     return {
@@ -167,6 +170,7 @@ export default {
       animation: state => state.animation,
       fps: state => state.fps,
       streamType: state => state.streamType,
+      useWorker: state => state.useWorker,
     }),
     ...mapGetters("file-settings", ["readerChunkSize"]),
 

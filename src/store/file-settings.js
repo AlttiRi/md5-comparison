@@ -4,6 +4,7 @@ const state = () => ({
     readerChunkSizeMB: 2,
     animation: true,
     fps: 25,
+    useWorker: true,
 });
 
 const mutations = {
@@ -22,10 +23,13 @@ const mutations = {
     fps(state, fps) {
         state.fps = fps;
     },
+    useWorker(state, useWorker) {
+        state.useWorker = useWorker;
+    },
 };
 
 const getters = {
-    readerChunkSize(state, getters) {
+    readerChunkSize(state, getters) { // in bytes
         return Math.trunc(Number(state.readerChunkSizeMB) * 1024 * 1024);
     },
 };
