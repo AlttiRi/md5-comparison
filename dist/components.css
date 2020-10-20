@@ -56,7 +56,7 @@
 }
 
 /* HasherItem.vue */
-.hasher-item-component[data-v-73979510] {
+.hasher-item-component[data-v-582472c2] {
   height: 200px;
   border: 1px solid dimgray;
   box-sizing: border-box;
@@ -64,27 +64,27 @@
   flex-direction: column;
   justify-content: space-between;
 }
-.hasher-item-component > div[data-v-73979510] {
+.hasher-item-component > div[data-v-582472c2] {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.hasher-item-component .top .progress-line[data-v-73979510] {
+.hasher-item-component .top .progress-line[data-v-582472c2] {
   background-color: var(--light-blue);
   min-height: 4px;
 }
-.hasher-item-component .top .name[data-v-73979510] {
+.hasher-item-component .top .name[data-v-582472c2] {
   padding: 6px 0;
 }
-.hasher-item-component .top .compute-buttons button[data-v-73979510] {
+.hasher-item-component .top .compute-buttons button[data-v-582472c2] {
   user-select: none;
 }
-.hasher-item-component .middle[data-v-73979510] {
+.hasher-item-component .middle[data-v-582472c2] {
   height: 100%;
   position: relative;
 }
-.hasher-item-component .middle .hash-times[data-v-73979510] {
+.hasher-item-component .middle .hash-times[data-v-582472c2] {
   height: 100%;
   width: 100%;
   display: flex;
@@ -92,29 +92,29 @@
   align-items: center;
   flex-direction: column;
 }
-.hasher-item-component .middle .hash-times .hash-time[data-v-73979510] {
+.hasher-item-component .middle .hash-times .hash-time[data-v-582472c2] {
   font-size: 18px;
   text-shadow: var(--light-blue) 0 0 30px, var(--light-blue) 0 0 1px;
   color: var(--dark-blue);
 }
-.hasher-item-component .middle .hash-times .hash-time.computing[data-v-73979510] {
+.hasher-item-component .middle .hash-times .hash-time.computing[data-v-582472c2] {
   opacity: 0.3;
 }
-.hasher-item-component .middle .hash-times .file-loading-time[data-v-73979510] {
+.hasher-item-component .middle .hash-times .file-loading-time[data-v-582472c2] {
   position: absolute;
   left: 0;
   bottom: 0;
   padding: 6px 18px;
   opacity: 0.7;
 }
-.hasher-item-component .middle .hash-times .total-hash-time[data-v-73979510] {
+.hasher-item-component .middle .hash-times .total-hash-time[data-v-582472c2] {
   position: absolute;
   right: 0;
   bottom: 0;
   padding: 6px 18px;
   opacity: 0.8;
 }
-.hasher-item-component .bottom .hash[data-v-73979510] {
+.hasher-item-component .bottom .hash[data-v-582472c2] {
   display: flex;
   justify-content: center;
   padding-bottom: 4px;
@@ -227,23 +227,23 @@
 }
 
 /* FileSettings.vue */
-.file-settings-component.inactive[data-v-36e5e740] {
+.file-settings-component.inactive[data-v-5a4b08b5] {
   opacity: 0.5;
 }
-.file-settings-component > *[data-v-36e5e740] {
+.file-settings-component > *[data-v-5a4b08b5] {
   margin: 6px 2px;
 }
-.file-settings-component input[type=number][data-v-36e5e740] {
+.file-settings-component input[type=number][data-v-5a4b08b5] {
   max-width: 42px;
   margin-left: 4px;
   margin-top: 4px;
 }
-.file-settings-component input[type=number].invalid[data-v-36e5e740] {
+.file-settings-component input[type=number].invalid[data-v-5a4b08b5] {
   border: 2px solid var(--red);
   outline: none;
   box-shadow: 0 0 1px 0 var(--red);
 }
-.red[data-v-36e5e740] {
+.red[data-v-5a4b08b5] {
   color: var(--red);
 }
 

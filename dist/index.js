@@ -122,6 +122,7 @@
         readerChunkSizeMB: 2,
         animation: true,
         fps: 25,
+        useWorker: true,
     });
 
     const mutations$1 = {
@@ -140,10 +141,13 @@
         fps(state, fps) {
             state.fps = fps;
         },
+        useWorker(state, useWorker) {
+            state.useWorker = useWorker;
+        },
     };
 
     const getters$1 = {
-        readerChunkSize(state, getters) {
+        readerChunkSize(state, getters) { // in bytes
             return Math.trunc(Number(state.readerChunkSizeMB) * 1024 * 1024);
         },
     };
@@ -217,8 +221,10 @@
         }
     }
 
-    // It works with the same speed in Chromium, but faster in Firefox
-    function * iterateBlob2(blob, chunkSize = 2 * 1024 * 1024) {
+    // Iterate Blob (or File)
+    // Note: `chunkSize` affects the execution speed
+    // It works with the same speed in Chromium, but a bit faster in Firefox (in comparison with `iterateBlob_v1`)
+    function * iterateBlob(blob, chunkSize = 2 * 1024 * 1024) {
         let index = 0;
         while (true) {
             const blobChunk = blob.slice(index, index + chunkSize);
@@ -232,7 +238,6 @@
             return new Uint8Array(await blob.arrayBuffer());
         }
     }
-
 
     function isArrayBuffer(data) {
         return data instanceof ArrayBuffer;
@@ -649,14 +654,13 @@
         },
         async compute() {
           if (!this.hasher.initialised) {
-            await this.hasher.init();
+            await this.hasher.init(); // if worker?
           }
 
           this.computing = true;
           this.time = 0;
           this.progress = 0;
-          this.$forceUpdate();
-          await new Promise(resolve => setTimeout(resolve, 16));
+          await this.forceUpdate();
 
           let input;
           if (isString(this.input)) {
@@ -673,14 +677,14 @@
               input = this.input;
               this.loadingToMemoryTime = this._loadingToMemoryTime;
             }
-            this.$forceUpdate();
-            await new Promise(resolve => setTimeout(resolve, 16));
+            await this.forceUpdate();
           }
 
+          const useWorker = this.useWorker && !this.inputIsString;
           const start = performance.now();
-          this.hash = this.hasher.hash(input);
-          this.progress = 100;
+          this.hash = await this.hasher.hash(input, useWorker);
           this.time = performance.now() - start;
+          this.progress = 100;
           this.newInput = false;
 
           this.computing = false;
@@ -692,24 +696,24 @@
 
           this.computing = true;
           this.progress = 0;
-          await new Promise(resolve => setTimeout(resolve, 16));
+          await this.forceUpdate();
 
           const self = this;
           this.loadingToMemoryTime = null;
 
           if (this.streamMode === "FileReader") {
-            console.log(this.readerChunkSize);
-            await _hashIterable(iterateBlob2(this.input, this.readerChunkSize), this.input.size);
+            await _hashIterable(iterateBlob(this.input, this.readerChunkSize), this.input.size);
           } else if (this.streamMode === "ReadableStream") {
             await _hashIterable(iterateReadableStream(this.input.stream()), this.input.size);
-          } else if (this.streamMode === "ArrayBuffer") {
+          } else if (this.streamMode === "ArrayBuffer") { // if stored in memory
             await _hashIterable(iterateArrayBuffer(this.input), this.input.byteLength);
           }
           this.newInput = false;
           this.computing = false;
 
-          async function _hashIterable(iterable, length) {
-            const hasher = new self.hasher();
+          /** @typedef {Iterable<Uint8Array>|Generator<Uint8Array>|AsyncGenerator<Uint8Array>} IterableU8A */
+          async function _hashIterable(/**@type {IterableU8A}*/ iterable, length) {
+            const hasher = self.hasher.getInstance();
             const start = performance.now();
             let curTime = start;
             let totalRead = 0;
@@ -732,7 +736,11 @@
             self.hash = hasher.finalize();
             self.time = performance.now() - start;
           }
-        }
+        },
+        async forceUpdate() {
+          this.$forceUpdate();
+          await new Promise(resolve => setTimeout(resolve, 16));
+        },
       },
       data() {
         return {
@@ -749,6 +757,7 @@
           animation: state => state.animation,
           fps: state => state.fps,
           streamType: state => state.streamType,
+          useWorker: state => state.useWorker,
         }),
         ...Vuex.mapGetters("file-settings", ["readerChunkSize"]),
 
@@ -955,7 +964,7 @@
       /* style */
       const __vue_inject_styles__$2 = undefined;
       /* scoped */
-      const __vue_scope_id__$2 = "data-v-73979510";
+      const __vue_scope_id__$2 = "data-v-582472c2";
       /* module identifier */
       const __vue_module_identifier__$2 = undefined;
       /* functional template */
@@ -1573,6 +1582,10 @@
         fps: {
           get() { return this.$store.state["file-settings"].fps; },
           set(value) { this.$store.commit("file-settings/fps", value); }
+        },
+        useWorker: {
+          get() { return this.$store.state["file-settings"].useWorker; },
+          set(value) { this.$store.commit("file-settings/useWorker", value); }
         }
       },
       watch: {
@@ -1595,6 +1608,52 @@
       var _h = _vm.$createElement;
       var _c = _vm._self._c || _h;
       return _c("div", { staticClass: "file-settings-component" }, [
+        _c("div", { staticClass: "use-worker" }, [
+          _c(
+            "label",
+            { attrs: { title: "Not works with stream hashing currently" } },
+            [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.useWorker,
+                    expression: "useWorker"
+                  }
+                ],
+                attrs: { type: "checkbox" },
+                domProps: {
+                  checked: Array.isArray(_vm.useWorker)
+                    ? _vm._i(_vm.useWorker, null) > -1
+                    : _vm.useWorker
+                },
+                on: {
+                  change: function($event) {
+                    var $$a = _vm.useWorker,
+                      $$el = $event.target,
+                      $$c = $$el.checked ? true : false;
+                    if (Array.isArray($$a)) {
+                      var $$v = null,
+                        $$i = _vm._i($$a, $$v);
+                      if ($$el.checked) {
+                        $$i < 0 && (_vm.useWorker = $$a.concat([$$v]));
+                      } else {
+                        $$i > -1 &&
+                          (_vm.useWorker = $$a
+                            .slice(0, $$i)
+                            .concat($$a.slice($$i + 1)));
+                      }
+                    } else {
+                      _vm.useWorker = $$c;
+                    }
+                  }
+                }
+              }),
+              _vm._v("Use web worker")
+            ]
+          )
+        ]),
         _c("div", { staticClass: "store-in-memory" }, [
           _c("label", [
             _c("input", {
@@ -1835,7 +1894,7 @@
       /* style */
       const __vue_inject_styles__$7 = undefined;
       /* scoped */
-      const __vue_scope_id__$7 = "data-v-36e5e740";
+      const __vue_scope_id__$7 = "data-v-5a4b08b5";
       /* module identifier */
       const __vue_module_identifier__$7 = undefined;
       /* functional template */
