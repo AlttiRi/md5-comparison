@@ -40,8 +40,25 @@ export function * iterateArrayBuffer(arrayBuffer, chunkSize = 65536) {
     }
 }
 
+// Iterate Blob (or File)
 // Note: `chunkSize` affects the execution speed
-export function * iterateBlob1(blob, chunkSize = 2 * 1024 * 1024) {
+// It works with the same speed in Chromium, but a bit faster in Firefox (in comparison with `iterateBlob_v1`)
+export function * iterateBlob(blob, chunkSize = 2 * 1024 * 1024) {
+    let index = 0;
+    while (true) {
+        const blobChunk = blob.slice(index, index + chunkSize);
+        if (!blobChunk.size) {break;}
+
+        yield read(blobChunk);
+        index += chunkSize;
+    }
+
+    async function read(blob) {
+        return new Uint8Array(await blob.arrayBuffer());
+    }
+}
+
+export function * iterateBlob_v1(blob, chunkSize = 2 * 1024 * 1024) {
     let index = 0;
     const reader = new FileReader();
 
@@ -62,23 +79,6 @@ export function * iterateBlob1(blob, chunkSize = 2 * 1024 * 1024) {
         return new Uint8Array(result);
     }
 }
-
-// It works with the same speed in Chromium, but faster in Firefox
-export function * iterateBlob2(blob, chunkSize = 2 * 1024 * 1024) {
-    let index = 0;
-    while (true) {
-        const blobChunk = blob.slice(index, index + chunkSize);
-        if (!blobChunk.size) {break;}
-
-        yield read(blobChunk);
-        index += chunkSize;
-    }
-
-    async function read(blob) {
-        return new Uint8Array(await blob.arrayBuffer());
-    }
-}
-
 
 export function isArrayBuffer(data) {
     return data instanceof ArrayBuffer;

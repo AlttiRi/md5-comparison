@@ -209,6 +209,9 @@ class HasherJsMD5 extends Hasher {
     }
 
     static getInstance(useWorker = true) {
+        if (useWorker) {
+            // return null; // todo stream worker hashing
+        }
         return new HasherJsMD5();
     }
 

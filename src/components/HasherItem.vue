@@ -115,17 +115,17 @@ export default {
       this.loadingToMemoryTime = null;
 
       if (this.streamMode === "FileReader") {
-        console.log(this.readerChunkSize);
-        await _hashIterable(Util.iterateBlob2(this.input, this.readerChunkSize), this.input.size);
+        await _hashIterable(Util.iterateBlob(this.input, this.readerChunkSize), this.input.size);
       } else if (this.streamMode === "ReadableStream") {
         await _hashIterable(Util.iterateReadableStream(this.input.stream()), this.input.size);
-      } else if (this.streamMode === "ArrayBuffer") {
+      } else if (this.streamMode === "ArrayBuffer") { // if stored in memory
         await _hashIterable(Util.iterateArrayBuffer(this.input), this.input.byteLength);
       }
       this.newInput = false;
       this.computing = false;
 
-      async function _hashIterable(iterable, length) {
+      /** @typedef {Iterable<Uint8Array>|Generator<Uint8Array>|AsyncGenerator<Uint8Array>} IterableU8A */
+      async function _hashIterable(/**@type {IterableU8A}*/ iterable, length) {
         const hasher = self.hasher.getInstance();
         const start = performance.now();
         let curTime = start;

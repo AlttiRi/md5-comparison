@@ -1,7 +1,7 @@
 <template lang="pug">
 div.file-settings-component
   div.use-worker
-    label
+    label(title="Not works with stream hashing currently")
       input(type="checkbox" v-model="useWorker")
       | Use web worker
   div.store-in-memory
