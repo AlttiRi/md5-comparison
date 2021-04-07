@@ -3,7 +3,7 @@
 Work in progress yet, lol.
 
 ## TODO
-- Complete (It's almost done, but I need to do some features. For example, stream computing with Web Worker.)
+- Complete (It's almost done, but I need to do some features. For example, add stream computing with Web Worker, and fix "Store in memory" mode with enabled Web Worker.)
 - Description (It requires a long description about performance (for both Chromiums and Firefox) and about the different settings)
 
 ## Short description
