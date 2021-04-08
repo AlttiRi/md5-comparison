@@ -1,4 +1,4 @@
-import {build, minify, sourceMappingURL, write} from "./common.js";
+import {build, minify, sourceMappingURL, writeResource} from "./common.js";
 import {dist as _dist} from "./settings.js";
 import {appendFinally} from "./rollup-plugins.js";
 import resolve from "@rollup/plugin-node-resolve";
@@ -59,10 +59,10 @@ const outputOptions = {
         const map = JSON.parse(Buffer.from(mapBase64, "base64").toString("binary"));
         const code = output.substring(0, offset) + sourceMappingURL(filename);
 
-        const written = write(code, map, filename + ".js", dist);
+        const written = writeResource(code, map, filename + ".js", dist);
 
         const {code: codeMin, map: mapMin} = await minify(code, map, filename);
-        const writtenMin = write(codeMin, mapMin, filename + ".min.js", dist);
+        const writtenMin = writeResource(codeMin, mapMin, filename + ".min.js", dist);
 
         promises.push(written, writtenMin);
     }

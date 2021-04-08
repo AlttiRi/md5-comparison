@@ -7,12 +7,12 @@ import {pathsMapping} from "./settings.js";
 export async function build(inputOptions, outputOptions, filename, dist, skipMinifying) {
     const promises = [];
     const {code, map} = await bundle(inputOptions, outputOptions);
-    const written = write(code, map, filename + ".js", dist);
+    const written = writeResource(code, map, filename + ".js", dist);
     promises.push(written);
 
     if (!skipMinifying) {
         const {code: codeMin, map: mapMin} = await minify(code, map, filename);
-        const writtenMin = write(codeMin, mapMin, filename + ".min.js", dist);
+        const writtenMin = writeResource(codeMin, mapMin, filename + ".min.js", dist);
         promises.push(writtenMin);
     }
 
@@ -72,11 +72,11 @@ export function getVueStylesWriter(name, dist) {
                 return text;
             })
             .reduce((pre, acc) => pre + acc, "");
-        await write(styleBunch, null, name, dist);
+        await writeResource(styleBunch, null, name, dist);
     }
 }
 
-export async function write(code, map, name, dist) {
+export async function writeResource(code, map, name, dist) {
     await fs.mkdir(dist, {recursive: true});
     await fs.writeFile(`${dist}${name}`, code);
     if (map) {

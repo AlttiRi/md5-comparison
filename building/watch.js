@@ -1,5 +1,5 @@
 import {watch} from "rollup";
-import {write} from "./common.js";
+import {writeResource} from "./common.js";
 import {bundleVue} from "./bundles.js";
 import {inputOptions, outputOptions, dist} from "./settings.js";
 
@@ -36,7 +36,7 @@ watcher.on("event", async event => {
 //     console.log(event);
 //     if (event.code === "BUNDLE_END") {
 //         const res = await event.result.generate(outputOptions);
-//         await write(res.output[0].code, res.output[0].map, "index.js", dist);
+//         await writeResource(res.output[0].code, res.output[0].map, "index.js", dist);
 //     }
 // });
 
